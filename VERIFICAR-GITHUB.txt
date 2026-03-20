@@ -1,0 +1,68 @@
+═══════════════════════════════════════════════════════════════
+  CHECKLIST - Verificar que GitHub está en orden
+  Repo: https://github.com/devpepe-code/ffaavvoorrcciittooss1
+═══════════════════════════════════════════════════════════════
+
+Abre el repo y verifica lo siguiente:
+
+1. ESTRUCTURA EN LA RAÍZ
+   ─────────────────────
+   En la raíz del repo (no dentro de ninguna carpeta) debes ver:
+
+   ✓ package.json
+   ✓ package-lock.json
+   ✓ tsconfig.json
+   ✓ next.config.mjs
+   ✓ postcss.config.mjs
+   ✓ tailwind.config.ts
+   ✓ vercel.json
+   ✓ .env.example
+   ✓ .gitignore
+   ✓ .eslintrc.json
+   ✓ .vercelignore
+   ✓ prisma/ (carpeta)
+   ✓ scripts/ (carpeta)
+   ✓ src/ (carpeta)
+
+   ✗ NO debe haber una carpeta "favorcitos-RAIZ" o "favorcitos-SUBIR-AHORA"
+     con todo dentro. Todo debe estar en la raíz.
+
+2. DENTRO DE prisma/
+   ─────────────────
+   ✓ schema.prisma
+   ✓ seed.ts
+   ✓ migrations/ (carpeta con migration.sql)
+
+3. DENTRO DE src/
+   ──────────────
+   ✓ app/ (con layout.tsx, page.tsx, globals.css, etc.)
+   ✓ components/
+   ✓ lib/ (con auth.ts, db.ts, auth.config.ts, utils.ts)
+   ✓ middleware.ts
+   ✓ types/
+
+4. DENTRO DE scripts/
+   ──────────────────
+   ✓ ensure-env.js
+
+5. package.json - línea "build"
+   ───────────────────────────
+   Debe decir:
+   "build": "node scripts/ensure-env.js && prisma generate && prisma migrate deploy && next build"
+
+6. prisma/schema.prisma - línea 7
+   ───────────────────────────────
+   Debe decir:
+   url      = env("favoritosdatabase_POSTGRES_PRISMA_URL")
+
+7. tsconfig.json
+   ─────────────
+   Debe tener:
+   "baseUrl": "."
+   "paths": { "@/*": ["src/*"] }
+
+═══════════════════════════════════════════════════════════════
+  Si algo falla:
+  - Si ves una carpeta con todo dentro → Root Directory en Vercel = nombre de esa carpeta
+  - Si todo está en la raíz → Root Directory en Vercel = VACÍO
+═══════════════════════════════════════════════════════════════
