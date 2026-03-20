@@ -26,7 +26,7 @@ export const authConfig = {
 
       if (isPublic && path !== '/login' && path !== '/registro') return true;
       if (path === '/login' || path === '/registro') {
-        if (isLoggedIn) return Response.redirect(new URL('/cliente/dashboard', nextUrl));
+        if (isLoggedIn) return Response.redirect(new URL('/dashboard', nextUrl));
         return true;
       }
       if (!isLoggedIn) return Response.redirect(new URL('/login', nextUrl));
