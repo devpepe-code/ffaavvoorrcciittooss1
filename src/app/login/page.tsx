@@ -2,14 +2,13 @@
 
 import { Suspense, useState } from 'react';
 import { signIn } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 function LoginContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/cliente/dashboard';
   const [email, setEmail] = useState('');
@@ -32,8 +31,8 @@ function LoginContent() {
         setLoading(false);
         return;
       }
-      router.push(callbackUrl);
-      router.refresh();
+      // Usar redirección completa para que el servidor reciba la cookie de sesión
+      window.location.href = callbackUrl;
     } catch {
       setError('Error al iniciar sesión');
     }
