@@ -25,37 +25,35 @@ export function Navbar() {
           ) : session ? (
             <>
               <a
-                href={
-                  (session.user as { role?: string })?.role === 'ADMIN'
-                    ? '/admin/dashboard'
-                    : (session.user as { role?: string })?.role === 'TASKER'
-                    ? '/tasker/dashboard'
-                    : '/cliente/dashboard'
-                }
+                href="/dashboard"
                 className="flex items-center gap-2 text-slate-600 hover:text-amber-600"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.href =
-                    (session.user as { role?: string })?.role === 'ADMIN'
-                      ? '/admin/dashboard'
-                      : (session.user as { role?: string })?.role === 'TASKER'
-                      ? '/tasker/dashboard'
-                      : '/cliente/dashboard';
+                  window.location.href = '/dashboard';
                 }}
               >
                 <LayoutDashboard className="h-4 w-4" />
                 Dashboard
               </a>
               <a
-                href="/cliente/mis-reservas"
+                href={
+                  (session.user as { role?: string })?.role === 'TASKER'
+                    ? '/tasker/dashboard'
+                    : '/cliente/mis-reservas'
+                }
                 className="flex items-center gap-2 text-slate-600 hover:text-amber-600"
                 onClick={(e) => {
                   e.preventDefault();
-                  window.location.href = '/cliente/mis-reservas';
+                  window.location.href =
+                    (session.user as { role?: string })?.role === 'TASKER'
+                      ? '/tasker/dashboard'
+                      : '/cliente/mis-reservas';
                 }}
               >
                 <User className="h-4 w-4" />
-                Mis Reservas
+                {(session.user as { role?: string })?.role === 'TASKER'
+                  ? 'Mis Trabajos'
+                  : 'Mis Reservas'}
               </a>
               {(session.user as { role?: string })?.role === 'ADMIN' && (
                 <Link
