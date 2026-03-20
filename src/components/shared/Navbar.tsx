@@ -33,6 +33,15 @@ export function Navbar() {
                     : '/cliente/dashboard'
                 }
                 className="flex items-center gap-2 text-slate-600 hover:text-amber-600"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href =
+                    (session.user as { role?: string })?.role === 'ADMIN'
+                      ? '/admin/dashboard'
+                      : (session.user as { role?: string })?.role === 'TASKER'
+                      ? '/tasker/dashboard'
+                      : '/cliente/dashboard';
+                }}
               >
                 <LayoutDashboard className="h-4 w-4" />
                 Dashboard
@@ -40,6 +49,10 @@ export function Navbar() {
               <a
                 href="/cliente/mis-reservas"
                 className="flex items-center gap-2 text-slate-600 hover:text-amber-600"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.location.href = '/cliente/mis-reservas';
+                }}
               >
                 <User className="h-4 w-4" />
                 Mis Reservas
