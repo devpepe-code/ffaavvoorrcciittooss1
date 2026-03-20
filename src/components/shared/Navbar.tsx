@@ -24,7 +24,7 @@ export function Navbar() {
             <span className="text-sm text-slate-500">Cargando...</span>
           ) : session ? (
             <>
-              <Link
+              <a
                 href={
                   (session.user as { role?: string })?.role === 'ADMIN'
                     ? '/admin/dashboard'
@@ -36,14 +36,14 @@ export function Navbar() {
               >
                 <LayoutDashboard className="h-4 w-4" />
                 Dashboard
-              </Link>
-              <Link
+              </a>
+              <a
                 href="/cliente/mis-reservas"
                 className="flex items-center gap-2 text-slate-600 hover:text-amber-600"
               >
                 <User className="h-4 w-4" />
                 Mis Reservas
-              </Link>
+              </a>
               {(session.user as { role?: string })?.role === 'ADMIN' && (
                 <Link
                   href="/admin/dashboard"
