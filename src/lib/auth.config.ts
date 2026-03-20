@@ -2,6 +2,7 @@ import type { NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 export const authConfig = {
+  trustHost: true, // Necesario para Vercel y múltiples dominios
   providers: [
     Credentials({
       credentials: {},
