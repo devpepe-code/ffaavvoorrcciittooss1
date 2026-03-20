@@ -1,0 +1,42 @@
+═══════════════════════════════════════════════════════════════
+  FAVORCITOS - SUBIR A GITHUB (estructura correcta)
+═══════════════════════════════════════════════════════════════
+
+Esta carpeta tiene TODO listo con la estructura correcta.
+package.json, src, prisma, scripts están en la RAÍZ.
+
+PASOS PARA SUBIR:
+─────────────────
+
+1. Abre https://github.com/devpepe-code/ffaavvoorrcciittooss1
+
+2. BORRA todo lo que haya en el repo:
+   - Entra en cada carpeta/archivo
+   - Delete file / Delete directory
+   - Deja el repo completamente vacío
+
+3. Add file → Upload files
+
+4. En tu Mac: abre esta carpeta "favorcitos-SUBIR-AHORA"
+
+5. IMPORTANTE: entra DENTRO de la carpeta y selecciona TODO (Cmd+A)
+   - Debes ver: package.json, src, prisma, scripts, .env.example, etc.
+   - NO arrastres la carpeta "favorcitos-SUBIR-AHORA"
+   - Arrastra el CONTENIDO (los archivos y carpetas que ves dentro)
+
+6. Arrastra todo a la zona de subida de GitHub
+
+7. Commit message: "Favorcitos - estructura correcta"
+
+8. Commit changes
+
+9. En Vercel:
+   - Settings → General → Root Directory: VACÍO (borra favorcitos-RAIZ si estaba)
+   - Deployments → Redeploy
+
+10. Listo: https://ffaavvoorrcciittooss1.vercel.app
+
+═══════════════════════════════════════════════════════════════
+  RESUMEN: Sube el CONTENIDO de esta carpeta a la RAÍZ del repo.
+          Root Directory en Vercel = VACÍO
+═══════════════════════════════════════════════════════════════
