@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 function LoginContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const urlError = searchParams.get('error');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -21,21 +22,12 @@ function LoginContent() {
     setError('');
     setLoading(true);
     try {
-      const res = await signIn('credentials', {
+      await signIn('credentials', {
         email,
         password,
-        redirect: false,
+        redirect: true,
         callbackUrl: '/dashboard',
       });
-      if (res?.error) {
-        setError('Email o contraseña incorrectos');
-        setLoading(false);
-        return;
-      }
-      // Pequeña pausa para que la cookie de sesión se escriba antes de redirigir
-      setTimeout(() => {
-        window.location.href = callbackUrl;
-      }, 100);
     } catch {
       setError('Error al iniciar sesión');
     }
@@ -53,8 +45,10 @@ function LoginContent() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
+            {(error || urlError) && (
+              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                {error || (urlError === 'CredentialsSignin' ? 'Email o contraseña incorrectos' : 'Error al iniciar sesión')}
+              </div>
             )}
             <div>
               <label className="mb-1 block text-sm font-medium">Email</label>
