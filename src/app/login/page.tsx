@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 function LoginContent() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/cliente/dashboard';
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,14 +25,17 @@ function LoginContent() {
         email,
         password,
         redirect: false,
+        callbackUrl: '/dashboard',
       });
       if (res?.error) {
         setError('Email o contraseña incorrectos');
         setLoading(false);
         return;
       }
-      // Usar redirección completa para que el servidor reciba la cookie de sesión
-      window.location.href = callbackUrl;
+      // Pequeña pausa para que la cookie de sesión se escriba antes de redirigir
+      setTimeout(() => {
+        window.location.href = callbackUrl;
+      }, 100);
     } catch {
       setError('Error al iniciar sesión');
     }
