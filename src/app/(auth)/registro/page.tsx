@@ -9,25 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff } from 'lucide-react';
 import { SERVICE_CATEGORIES } from '@/types';
-
-const CITIES_BY_COUNTRY: Record<string, string[]> = {
-  México: [
-    'Ciudad de México', 'Guadalajara', 'Monterrey', 'Puebla',
-    'Cancún', 'Tijuana', 'Mérida', 'León', 'Querétaro',
-  ],
-  Argentina: [
-    'Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza',
-    'La Plata', 'San Miguel de Tucumán', 'Mar del Plata',
-  ],
-  Colombia: [
-    'Bogotá', 'Medellín', 'Cali', 'Barranquilla',
-    'Cartagena', 'Bucaramanga', 'Pereira',
-  ],
-  Chile: [
-    'Santiago', 'Valparaíso', 'Concepción', 'La Serena',
-    'Antofagasta', 'Temuco', 'Viña del Mar',
-  ],
-};
+import { ESTADOS_MEXICO, CIUDADES_POR_ESTADO } from '@/lib/mexicoData';
 
 type Role = 'CLIENTE' | 'TASKER';
 
@@ -39,8 +21,10 @@ export default function RegisterPage() {
     password: '',
     firstName: '',
     lastName: '',
-    country: 'México',
+    phone: '',
+    estado: '',
     city: '',
+    colonia: '',
     bio: '',
     services: [] as string[],
   });
@@ -61,6 +45,7 @@ export default function RegisterPage() {
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
       e.email = 'Email inválido';
     if (form.password.length < 6) e.password = 'Mínimo 6 caracteres';
+    if (!form.estado) e.estado = 'Selecciona un estado';
     if (!form.city) e.city = 'Selecciona una ciudad';
     if (role === 'TASKER') {
       if (!form.bio.trim()) e.bio = 'Agrega una descripción breve de tus servicios';
@@ -82,7 +67,12 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...form, role }),
+        body: JSON.stringify({
+          ...form,
+          country: 'México',
+          role,
+          phone: form.phone ? form.phone : undefined,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -120,6 +110,8 @@ export default function RegisterPage() {
     form.password.length === 0 ? 0 : form.password.length < 6 ? 1 : form.password.length < 10 ? 2 : 3;
   const pwColor = ['', '#EF4444', '#FF6B35', '#22C55E'][pwStrength];
   const pwLabel = ['', 'Débil', 'Aceptable', 'Fuerte'][pwStrength];
+
+  const ciudades = form.estado ? (CIUDADES_POR_ESTADO[form.estado] || []) : [];
 
   /* ── Role selector ── */
   if (!role) {
@@ -323,26 +315,54 @@ export default function RegisterPage() {
               )}
             </div>
 
+            <div>
+              <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
+                Teléfono <span style={{ color: '#9CA3AF' }}>(opcional)</span>
+              </label>
+              <div className="flex">
+                <span
+                  className="flex items-center rounded-l-lg border border-r-0 border-slate-200 bg-slate-50 px-3 text-sm"
+                  style={{ color: '#6B7280' }}
+                >
+                  🇲🇽 +52
+                </span>
+                <Input
+                  type="tel"
+                  placeholder="55 1234 5678"
+                  value={form.phone}
+                  onChange={(e) => setField('phone', e.target.value)}
+                  className="rounded-l-none"
+                  aria-label="Teléfono"
+                />
+              </div>
+            </div>
+
+            {/* Estado / Ciudad */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
-                  País
+                  Estado
                 </label>
                 <select
-                  className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
-                  value={form.country}
-                  onChange={(e) => setForm((f) => ({ ...f, country: e.target.value, city: '' }))}
-                  aria-label="País"
+                  className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35] ${
+                    errors.estado ? 'border-red-400' : 'border-slate-200'
+                  }`}
+                  value={form.estado}
+                  onChange={(e) => setForm((f) => ({ ...f, estado: e.target.value, city: '' }))}
+                  aria-label="Estado"
                 >
-                  <option value="México">🇲🇽 México</option>
-                  <option value="Argentina">🇦🇷 Argentina</option>
-                  <option value="Colombia">🇨🇴 Colombia</option>
-                  <option value="Chile">🇨🇱 Chile</option>
+                  <option value="">Selecciona estado</option>
+                  {ESTADOS_MEXICO.map((est) => (
+                    <option key={est} value={est}>{est}</option>
+                  ))}
                 </select>
+                {errors.estado && (
+                  <p className="mt-1 text-xs" style={{ color: '#EF4444' }}>{errors.estado}</p>
+                )}
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
-                  Ciudad
+                  Ciudad / Alcaldía
                 </label>
                 <select
                   className={`flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35] ${
@@ -350,10 +370,13 @@ export default function RegisterPage() {
                   }`}
                   value={form.city}
                   onChange={(e) => setField('city', e.target.value)}
+                  disabled={!form.estado}
                   aria-label="Ciudad"
                 >
-                  <option value="">Selecciona ciudad</option>
-                  {(CITIES_BY_COUNTRY[form.country] || []).map((c) => (
+                  <option value="">
+                    {form.estado ? 'Selecciona ciudad' : 'Primero elige estado'}
+                  </option>
+                  {ciudades.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
@@ -361,6 +384,19 @@ export default function RegisterPage() {
                   <p className="mt-1 text-xs" style={{ color: '#EF4444' }}>{errors.city}</p>
                 )}
               </div>
+            </div>
+
+            {/* Colonia */}
+            <div>
+              <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
+                Colonia <span style={{ color: '#9CA3AF' }}>(opcional)</span>
+              </label>
+              <Input
+                placeholder="Ej: Del Valle, Condesa, Polanco..."
+                value={form.colonia}
+                onChange={(e) => setField('colonia', e.target.value)}
+                aria-label="Colonia"
+              />
             </div>
 
             {role === 'TASKER' && (
