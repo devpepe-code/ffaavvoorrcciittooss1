@@ -5,13 +5,16 @@ import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, MapPin, CheckCircle, Briefcase } from 'lucide-react';
+import { Star, MapPin, CheckCircle, Briefcase, Phone } from 'lucide-react';
 
 type Tasker = {
   id: string;
   firstName: string;
   lastName: string;
   city: string;
+  estado: string | null;
+  colonia: string | null;
+  phone: string | null;
   taskerProfile: {
     bio: string | null;
     services: string;
@@ -20,6 +23,7 @@ type Tasker = {
     totalReviews: number;
     completedJobs: number;
     verificationStatus: string;
+    whatsapp: string | null;
   } | null;
 };
 
@@ -55,6 +59,13 @@ export function TaskerProfileView({
     router.push(`/reserva/nueva?taskerId=${tasker.id}&servicio=${selectedService}`);
   }
 
+  const whatsappNumber = tasker.taskerProfile?.whatsapp || tasker.phone;
+  const whatsappHref = whatsappNumber
+    ? `https://wa.me/${whatsappNumber.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola, vi tu perfil en Favorcitos y me gustaría solicitar un servicio.`)}`
+    : null;
+
+  const locationParts = [tasker.colonia, tasker.city, tasker.estado].filter(Boolean);
+
   return (
     <div className="space-y-6">
       {/* Profile header */}
@@ -86,8 +97,8 @@ export function TaskerProfileView({
                   </span>
                 </div>
                 <div className="flex items-center gap-1" style={{ color: '#6B7280' }}>
-                  <MapPin className="h-4 w-4" />
-                  {tasker.city}
+                  <MapPin className="h-4 w-4 shrink-0" />
+                  <span>{locationParts.join(', ') || tasker.city}</span>
                 </div>
                 <div className="flex items-center gap-1" style={{ color: '#6B7280' }}>
                   <Briefcase className="h-4 w-4" />
@@ -110,6 +121,20 @@ export function TaskerProfileView({
               )}
             </div>
           </div>
+
+          {/* WhatsApp CTA */}
+          {whatsappHref && (
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-5 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              style={{ backgroundColor: '#25D366' }}
+            >
+              <Phone className="h-4 w-4" />
+              Contactar por WhatsApp
+            </a>
+          )}
         </CardContent>
       </Card>
 
@@ -185,14 +210,17 @@ export function TaskerProfileView({
         <Button className="flex-1 rounded-xl" size="lg" onClick={handleSolicitar}>
           Solicitar Servicio
         </Button>
-        <Button
-          variant="outline"
-          size="lg"
-          className="rounded-xl"
-          onClick={() => router.push(`/reserva/nueva?taskerId=${tasker.id}`)}
-        >
-          Ver detalles
-        </Button>
+        {whatsappHref && (
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center rounded-xl px-4 text-sm font-medium text-white transition-opacity hover:opacity-90"
+            style={{ backgroundColor: '#25D366' }}
+          >
+            <Phone className="h-4 w-4" />
+          </a>
+        )}
       </div>
     </div>
   );

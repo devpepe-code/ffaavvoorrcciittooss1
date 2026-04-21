@@ -11,7 +11,30 @@ export default async function TaskerProfilePage({ params }: { params: { id: stri
   if (!tasker) notFound();
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-      <TaskerProfileView tasker={tasker} categories={SERVICE_CATEGORIES} />
+      <TaskerProfileView
+        tasker={{
+          id: tasker.id,
+          firstName: tasker.firstName,
+          lastName: tasker.lastName,
+          city: tasker.city,
+          estado: tasker.estado ?? null,
+          colonia: tasker.colonia ?? null,
+          phone: tasker.phone ?? null,
+          taskerProfile: tasker.taskerProfile
+            ? {
+                bio: tasker.taskerProfile.bio,
+                services: tasker.taskerProfile.services,
+                hourlyRates: tasker.taskerProfile.hourlyRates,
+                averageRating: tasker.taskerProfile.averageRating,
+                totalReviews: tasker.taskerProfile.totalReviews,
+                completedJobs: tasker.taskerProfile.completedJobs,
+                verificationStatus: tasker.taskerProfile.verificationStatus,
+                whatsapp: tasker.taskerProfile.whatsapp ?? null,
+              }
+            : null,
+        }}
+        categories={SERVICE_CATEGORIES}
+      />
     </div>
   );
 }
