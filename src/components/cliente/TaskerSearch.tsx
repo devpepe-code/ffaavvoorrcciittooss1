@@ -8,13 +8,18 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { SERVICE_CATEGORIES } from '@/types';
-import { Search, Star, MapPin, AlertCircle } from 'lucide-react';
+import { ESTADOS_MEXICO, CIUDADES_POR_ESTADO } from '@/lib/mexicoData';
+import { Search, Star, MapPin, AlertCircle, Map, List } from 'lucide-react';
+import { SearchMap } from './SearchMap';
+import { useGeolocation } from '@/hooks/useGeolocation';
 
 type Tasker = {
   id: string;
   firstName: string;
   lastName: string;
   city: string;
+  estado: string | null;
+  colonia: string | null;
   taskerProfile: {
     bio: string | null;
     services: string;
@@ -22,6 +27,10 @@ type Tasker = {
     totalReviews: number;
     completedJobs: number;
     verificationStatus: string;
+    lat?: number | null;
+    lng?: number | null;
+    serviceRadiusKm?: number | null;
+    coverageRadius?: number | null;
   } | null;
 };
 
@@ -29,10 +38,14 @@ export function TaskerSearch() {
   const searchParams = useSearchParams();
   const categoriaParam = searchParams.get('categoria') || '';
   const [categoria, setCategoria] = useState(categoriaParam);
+  const [estado, setEstado] = useState('');
   const [ciudad, setCiudad] = useState('');
   const [taskers, setTaskers] = useState<Tasker[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+
+  const geo = useGeolocation();
 
   useEffect(() => {
     setCategoria(categoriaParam);
@@ -45,6 +58,7 @@ export function TaskerSearch() {
       try {
         const params = new URLSearchParams();
         if (categoria) params.set('categoria', categoria);
+        if (estado) params.set('estado', estado);
         if (ciudad) params.set('ciudad', ciudad);
         const res = await fetch(`/api/taskers/search?${params}`);
         const data = await res.json();
@@ -57,7 +71,9 @@ export function TaskerSearch() {
       }
     }
     fetchTaskers();
-  }, [categoria, ciudad]);
+  }, [categoria, estado, ciudad]);
+
+  const ciudades = estado ? (CIUDADES_POR_ESTADO[estado] || []) : [];
 
   const getServiceLabel = (val: string) =>
     SERVICE_CATEGORIES.find((c) => c.value === val)?.label || val;
@@ -78,8 +94,8 @@ export function TaskerSearch() {
         className="mb-6 rounded-2xl p-4"
         style={{ backgroundColor: '#FFFFFF', border: '1px solid rgba(0,0,0,0.06)' }}
       >
-        <div className="flex flex-col gap-4 sm:flex-row">
-          <div className="flex-1">
+        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap">
+          <div className="min-w-[160px] flex-1">
             <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
               Categoría
             </label>
@@ -97,19 +113,111 @@ export function TaskerSearch() {
               ))}
             </select>
           </div>
-          <div className="flex-1">
+          <div className="min-w-[140px] flex-1">
+            <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
+              Estado
+            </label>
+            <select
+              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
+              value={estado}
+              onChange={(e) => { setEstado(e.target.value); setCiudad(''); }}
+              aria-label="Filtrar por estado"
+            >
+              <option value="">Todos los estados</option>
+              {ESTADOS_MEXICO.map((est) => (
+                <option key={est} value={est}>{est}</option>
+              ))}
+            </select>
+          </div>
+          <div className="min-w-[140px] flex-1">
             <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
               Ciudad
             </label>
-            <Input
-              placeholder="Ej: Ciudad de México"
-              value={ciudad}
-              onChange={(e) => setCiudad(e.target.value)}
-              aria-label="Filtrar por ciudad"
-            />
+            {estado ? (
+              <select
+                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
+                value={ciudad}
+                onChange={(e) => setCiudad(e.target.value)}
+                aria-label="Filtrar por ciudad"
+              >
+                <option value="">Todas las ciudades</option>
+                {ciudades.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            ) : (
+              <Input
+                placeholder="Ej: Guadalajara"
+                value={ciudad}
+                onChange={(e) => setCiudad(e.target.value)}
+                aria-label="Filtrar por ciudad"
+              />
+            )}
           </div>
         </div>
+
+        {/* Geo + view toggle row */}
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <button
+            onClick={geo.request}
+            disabled={geo.status === 'loading'}
+            className="flex items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-medium transition-colors"
+            style={{
+              borderColor: geo.status === 'success' ? '#2EC4B6' : '#E5E7EB',
+              color: geo.status === 'success' ? '#2EC4B6' : '#6B7280',
+              backgroundColor: geo.status === 'success' ? '#E8FAF9' : 'white',
+            }}
+          >
+            📍 {geo.status === 'loading' ? 'Localizando...' : geo.status === 'success' ? 'Ubicación detectada' : 'Usar mi ubicación'}
+          </button>
+
+          <div
+            className="flex rounded-xl border border-slate-200 p-0.5"
+            style={{ backgroundColor: '#F9FAFB' }}
+          >
+            <button
+              onClick={() => setViewMode('list')}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              style={{
+                backgroundColor: viewMode === 'list' ? '#FFFFFF' : 'transparent',
+                color: viewMode === 'list' ? '#1A1A2E' : '#6B7280',
+                boxShadow: viewMode === 'list' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+              }}
+            >
+              <List className="h-3.5 w-3.5" /> Lista
+            </button>
+            <button
+              onClick={() => setViewMode('map')}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+              style={{
+                backgroundColor: viewMode === 'map' ? '#FFFFFF' : 'transparent',
+                color: viewMode === 'map' ? '#1A1A2E' : '#6B7280',
+                boxShadow: viewMode === 'map' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+              }}
+            >
+              <Map className="h-3.5 w-3.5" /> Mapa
+            </button>
+          </div>
+        </div>
+
+        {geo.status === 'error' && (
+          <p className="mt-2 text-xs" style={{ color: '#EF4444' }}>{geo.message}</p>
+        )}
       </div>
+
+      {/* Map view */}
+      {viewMode === 'map' && !loading && !fetchError && (
+        <div className="mb-6">
+          <SearchMap
+            taskers={taskers}
+            onTaskerClick={(id) => {
+              const el = document.getElementById(`tasker-${id}`);
+              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }}
+            userLocation={geo.status === 'success' ? { lat: geo.lat, lng: geo.lng } : null}
+          />
+        </div>
+      )}
 
       {/* Results */}
       {loading ? (
@@ -155,7 +263,7 @@ export function TaskerSearch() {
             No se encontraron taskers
           </p>
           <p className="mt-2 text-sm" style={{ color: '#6B7280' }}>
-            Prueba ampliando la búsqueda o cambiando los filtros.
+            Prueba con otro estado o categoría, o deja los filtros vacíos para ver todos.
           </p>
         </div>
       ) : (
@@ -166,6 +274,7 @@ export function TaskerSearch() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {taskers.map((t) => (
               <Card
+                id={`tasker-${t.id}`}
                 key={t.id}
                 className="overflow-hidden rounded-2xl border-0 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
                 style={{ backgroundColor: '#FFFFFF' }}
@@ -191,8 +300,11 @@ export function TaskerSearch() {
                         <span>({t.taskerProfile?.totalReviews || 0} reseñas)</span>
                       </div>
                       <div className="mt-1 flex items-center gap-1 text-sm" style={{ color: '#6B7280' }}>
-                        <MapPin className="h-4 w-4" />
-                        {t.city}
+                        <MapPin className="h-4 w-4 shrink-0" />
+                        <span className="truncate">
+                          {t.colonia ? `${t.colonia}, ` : ''}{t.city}
+                          {t.estado && t.estado !== t.city ? `, ${t.estado}` : ''}
+                        </span>
                       </div>
                       {t.taskerProfile?.verificationStatus === 'APPROVED' && (
                         <Badge
