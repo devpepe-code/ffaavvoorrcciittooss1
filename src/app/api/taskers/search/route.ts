@@ -8,11 +8,13 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const categoria = searchParams.get('categoria');
     const ciudad = searchParams.get('ciudad');
+    const estado = searchParams.get('estado');
 
     const users = await prisma.user.findMany({
       where: {
         role: 'TASKER',
-        ...(ciudad ? { city: { contains: ciudad } } : {}),
+        ...(estado ? { estado: { contains: estado, mode: 'insensitive' } } : {}),
+        ...(ciudad ? { city: { contains: ciudad, mode: 'insensitive' } } : {}),
       },
       include: {
         taskerProfile: true,
@@ -37,6 +39,8 @@ export async function GET(req: NextRequest) {
         firstName: t.firstName,
         lastName: t.lastName,
         city: t.city,
+        estado: t.estado,
+        colonia: t.colonia,
         taskerProfile: t.taskerProfile,
       })),
     });
