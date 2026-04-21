@@ -40,22 +40,13 @@ export function Footer() {
                 Plataforma
               </p>
               <div className="flex flex-col gap-2">
-                <Link href="/buscar" className="text-sm transition-colors" style={{ color: '#9CA3AF' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = '#9CA3AF')}
-                >
+                <Link href="/buscar" className="text-sm text-[#9CA3AF] transition-colors hover:text-white">
                   Buscar Servicios
                 </Link>
-                <Link href="/registro" className="text-sm transition-colors" style={{ color: '#9CA3AF' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = '#9CA3AF')}
-                >
+                <Link href="/registro" className="text-sm text-[#9CA3AF] transition-colors hover:text-white">
                   Registrarse
                 </Link>
-                <Link href="/login" className="text-sm transition-colors" style={{ color: '#9CA3AF' }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = '#9CA3AF')}
-                >
+                <Link href="/login" className="text-sm text-[#9CA3AF] transition-colors hover:text-white">
                   Iniciar Sesión
                 </Link>
               </div>
