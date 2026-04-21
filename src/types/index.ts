@@ -7,10 +7,14 @@ export const SERVICE_CATEGORIES = [
   { value: 'PINTURA', label: 'Pintura', icon: '🎨' },
   { value: 'JARDINERIA', label: 'Jardinería', icon: '🌿' },
   { value: 'MUDANZA', label: 'Mudanza', icon: '📦' },
-  { value: 'ENSAMBLAJE_MUEBLES', label: 'Ensamblaje Muebles', icon: '🛠️' },
-  { value: 'HANDYMAN_GENERAL', label: 'Handyman General', icon: '👷' },
+  { value: 'ARMADO_MUEBLES', label: 'Armado de Muebles', icon: '🛠️' },
+  { value: 'MANITAS_GENERAL', label: 'Manitas de Obra', icon: '👷' },
   { value: 'CERRAJERIA', label: 'Cerrajería', icon: '🔐' },
   { value: 'AIRE_ACONDICIONADO', label: 'Aire Acondicionado', icon: '❄️' },
+  { value: 'IMPERMEABILIZACION', label: 'Impermeabilización', icon: '🏗️' },
+  { value: 'CONTROL_PLAGAS', label: 'Control de Plagas', icon: '🐜' },
+  { value: 'CATERING', label: 'Catering', icon: '🍽️' },
+  { value: 'CUIDADO_MASCOTAS', label: 'Cuidado de Mascotas', icon: '🐾' },
   { value: 'OTRO', label: 'Otro', icon: '📋' },
 ] as const;
 

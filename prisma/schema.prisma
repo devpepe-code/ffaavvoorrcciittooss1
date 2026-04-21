@@ -19,8 +19,10 @@ model User {
   profileImage  String?
   role          String    @default("CLIENTE")
   language      String    @default("es")
-  country       String
+  country       String    @default("México")
+  estado        String?
   city          String
+  colonia       String?
   address       String?
   coordinates   String?
   subscriptionTier String @default("FREE")
@@ -83,6 +85,12 @@ model TaskerProfile {
   bio                 String?
   services            String
   hourlyRates         String
+  estado              String?
+  colonia             String?
+  lat                 Float?
+  lng                 Float?
+  serviceRadiusKm     Int       @default(5)
+  whatsapp            String?
   coverageRadius      Int       @default(10)
   yearsOfExperience   Int?
   portfolioImages     String?
