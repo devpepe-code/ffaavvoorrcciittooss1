@@ -19,7 +19,7 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2 font-bold text-amber-600">
           <Wrench className="h-8 w-8" />
-          <span className="text-xl">agent is connected</span>
+          <span className="text-xl">Favorcitos</span>
         </Link>
         <div className="flex items-center gap-4">
           <Link href="/buscar" className="text-slate-600 hover:text-amber-600">Buscar Servicios</Link>
