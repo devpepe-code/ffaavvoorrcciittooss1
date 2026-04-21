@@ -9,7 +9,8 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-gradient-to-br from-amber-500 via-amber-600 to-orange-700 px-4 py-24 sm:px-6 sm:py-32">
         <div className="mx-auto max-w-7xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-            agent is connected
+            Servicios del hogar,{' '}
+            <span className="text-amber-100">cuando los necesites</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-amber-100">
             Conectamos a personas que necesitan ayuda con profesionales verificados en México, Brasil,
