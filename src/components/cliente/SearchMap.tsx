@@ -16,7 +16,7 @@ type TaskerMarker = {
 
 const mapContainerStyle = {
   width: '100%',
-  height: '400px',
+  height: '420px',
   borderRadius: '12px',
 };
 
@@ -28,29 +28,51 @@ type Props = {
     firstName: string;
     lastName: string;
     city: string;
-    taskerProfile: { coverageRadius?: number } | null;
+    taskerProfile: {
+      lat?: number | null;
+      lng?: number | null;
+      serviceRadiusKm?: number | null;
+      coverageRadius?: number | null;
+    } | null;
   }>;
   onTaskerClick?: (id: string) => void;
+  userLocation?: { lat: number; lng: number } | null;
 };
 
-export function SearchMap({ taskers, onTaskerClick }: Props) {
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+export function SearchMap({ taskers, onTaskerClick, userLocation: externalUserLocation }: Props) {
+  const [internalUserLocation, setInternalUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
+
+  const userLocation = externalUserLocation ?? internalUserLocation;
 
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
   });
 
   useEffect(() => {
+    if (externalUserLocation !== undefined) return;
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      () => setUserLocation(null)
+      (pos) => setInternalUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => setInternalUserLocation(null)
     );
-  }, []);
+  }, [externalUserLocation]);
 
   const taskerMarkers: TaskerMarker[] = taskers
     .map((t) => {
+      const lat = t.taskerProfile?.lat;
+      const lng = t.taskerProfile?.lng;
+      if (lat && lng) {
+        return {
+          id: t.id,
+          firstName: t.firstName,
+          lastName: t.lastName,
+          city: t.city,
+          coverageRadius: t.taskerProfile?.serviceRadiusKm ?? t.taskerProfile?.coverageRadius ?? 5,
+          lat,
+          lng,
+        };
+      }
       const coords = getCityCoordinates(t.city);
       if (!coords) return null;
       return {
@@ -58,20 +80,15 @@ export function SearchMap({ taskers, onTaskerClick }: Props) {
         firstName: t.firstName,
         lastName: t.lastName,
         city: t.city,
-        coverageRadius: t.taskerProfile?.coverageRadius ?? 10,
+        coverageRadius: t.taskerProfile?.serviceRadiusKm ?? t.taskerProfile?.coverageRadius ?? 5,
         lat: coords.lat,
         lng: coords.lng,
       };
     })
     .filter((t): t is TaskerMarker => t !== null);
 
-  const onLoad = useCallback((map: google.maps.Map) => {
-    setMap(map);
-  }, []);
-
-  const onUnmount = useCallback(() => {
-    setMap(null);
-  }, []);
+  const onLoad = useCallback((m: google.maps.Map) => setMap(m), []);
+  const onUnmount = useCallback(() => setMap(null), []);
 
   useEffect(() => {
     if (!map || (taskerMarkers.length === 0 && !userLocation)) return;
@@ -83,8 +100,8 @@ export function SearchMap({ taskers, onTaskerClick }: Props) {
 
   if (loadError || !process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
     return (
-      <div className="flex h-[400px] items-center justify-center rounded-xl border border-slate-200 bg-slate-50">
-        <p className="text-center text-slate-600">
+      <div className="flex h-[420px] items-center justify-center rounded-xl border border-slate-200 bg-slate-50">
+        <p className="text-center text-sm" style={{ color: '#6B7280' }}>
           {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
             ? 'Configura NEXT_PUBLIC_GOOGLE_MAPS_API_KEY para ver el mapa'
             : 'Error al cargar el mapa'}
@@ -95,8 +112,8 @@ export function SearchMap({ taskers, onTaskerClick }: Props) {
 
   if (!isLoaded) {
     return (
-      <div className="flex h-[400px] items-center justify-center rounded-xl border border-slate-200 bg-slate-50">
-        <p className="text-slate-600">Cargando mapa...</p>
+      <div className="flex h-[420px] animate-pulse items-center justify-center rounded-xl border border-slate-200 bg-slate-50">
+        <p className="text-sm" style={{ color: '#9CA3AF' }}>Cargando mapa...</p>
       </div>
     );
   }
@@ -108,7 +125,7 @@ export function SearchMap({ taskers, onTaskerClick }: Props) {
       <GoogleMap
         mapContainerStyle={mapContainerStyle}
         center={center}
-        zoom={10}
+        zoom={11}
         onLoad={onLoad}
         onUnmount={onUnmount}
         options={{
@@ -125,7 +142,7 @@ export function SearchMap({ taskers, onTaskerClick }: Props) {
             icon={{
               path: google.maps.SymbolPath.CIRCLE,
               scale: 10,
-              fillColor: '#3B82F6',
+              fillColor: '#2EC4B6',
               fillOpacity: 1,
               strokeColor: '#fff',
               strokeWeight: 2,
@@ -138,21 +155,21 @@ export function SearchMap({ taskers, onTaskerClick }: Props) {
               center={{ lat: t.lat, lng: t.lng }}
               radius={t.coverageRadius * 1000}
               options={{
-                fillColor: '#F59E0B',
-                fillOpacity: 0.15,
-                strokeColor: '#F59E0B',
-                strokeOpacity: 0.5,
+                fillColor: '#FF6B35',
+                fillOpacity: 0.1,
+                strokeColor: '#FF6B35',
+                strokeOpacity: 0.4,
                 strokeWeight: 1,
               }}
             />
             <Marker
               position={{ lat: t.lat, lng: t.lng }}
-              title={`${t.firstName} ${t.lastName} - ${t.city}`}
+              title={`${t.firstName} ${t.lastName} — ${t.city}`}
               onClick={() => onTaskerClick?.(t.id)}
               icon={{
                 path: google.maps.SymbolPath.CIRCLE,
-                scale: 8,
-                fillColor: '#F59E0B',
+                scale: 9,
+                fillColor: '#FF6B35',
                 fillOpacity: 1,
                 strokeColor: '#fff',
                 strokeWeight: 2,
@@ -161,8 +178,11 @@ export function SearchMap({ taskers, onTaskerClick }: Props) {
           </div>
         ))}
       </GoogleMap>
-      <div className="border-t border-slate-200 bg-white px-4 py-2 text-xs text-slate-500">
-        🔵 Tu ubicación · 🟠 Taskers y su área de cobertura
+      <div
+        className="border-t px-4 py-2 text-xs"
+        style={{ backgroundColor: '#FFFFFF', color: '#6B7280', borderColor: 'rgba(0,0,0,0.06)' }}
+      >
+        🟢 Tu ubicación · 🟠 Taskers y su área de cobertura
       </div>
     </div>
   );

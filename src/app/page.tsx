@@ -34,8 +34,8 @@ const WHY_ITEMS = [
   },
   {
     icon: <Users className="h-10 w-10" style={{ color: '#2EC4B6' }} />,
-    title: 'Hecho para LatAm',
-    desc: 'Diseñado para México, Argentina, Colombia y Chile.',
+    title: 'Hecho para México',
+    desc: 'Diseñado para la realidad mexicana — colonias, estados y costumbres locales.',
   },
 ];
 
@@ -57,7 +57,7 @@ export default function HomePage() {
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg" style={{ color: 'rgba(255,255,255,0.8)' }}>
             Conecta gratis con profesionales verificados de limpieza, plomería, electricidad y más
-            — en México, Argentina, Colombia y Chile.
+            — en tu ciudad, en tu colonia, sin comisiones.
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Link href="/buscar">
@@ -135,7 +135,7 @@ export default function HomePage() {
             ¿Por qué Favorcitos?
           </h2>
           <p className="mt-2 text-center text-sm" style={{ color: '#6B7280' }}>
-            La plataforma más directa para servicios del hogar en Latinoamérica
+            La plataforma más directa para servicios del hogar en México
           </p>
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {WHY_ITEMS.map((item) => (

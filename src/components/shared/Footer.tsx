@@ -30,7 +30,7 @@ export function Footer() {
               </span>
             </Link>
             <p className="mt-3 max-w-xs text-sm" style={{ color: '#9CA3AF' }}>
-              El favor que necesitas, a un clic de distancia.
+              El servicio que necesitas, en tu colonia.
             </p>
           </div>
 
@@ -53,13 +53,14 @@ export function Footer() {
             </div>
             <div>
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#6B7280' }}>
-                Países
+                Ciudades
               </p>
               <div className="flex flex-col gap-2 text-sm" style={{ color: '#9CA3AF' }}>
-                <span>🇲🇽 México</span>
-                <span>🇦🇷 Argentina</span>
-                <span>🇨🇴 Colombia</span>
-                <span>🇨🇱 Chile</span>
+                <span>Ciudad de México</span>
+                <span>Guadalajara</span>
+                <span>Monterrey</span>
+                <span>Puebla</span>
+                <span>Cancún</span>
               </div>
             </div>
           </div>
@@ -69,7 +70,7 @@ export function Footer() {
           className="mt-10 border-t pt-6 text-center text-sm"
           style={{ borderColor: 'rgba(255,255,255,0.08)', color: '#6B7280' }}
         >
-          © {new Date().getFullYear()} Favorcitos. Plataforma de servicios para Latinoamérica. Sin costos, sin comisiones.
+          © {new Date().getFullYear()} Favorcitos. La plataforma de servicios del hogar en México. Sin costos, sin comisiones.
         </div>
       </div>
     </footer>
