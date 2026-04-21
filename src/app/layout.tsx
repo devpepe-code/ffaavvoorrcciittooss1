@@ -5,8 +5,9 @@ import { Footer } from '@/components/shared/Footer';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Favorcitos - Servicios del Hogar',
-  description: 'Plataforma de servicios para Latinoamérica',
+  title: 'Favorcitos - Servicios del Hogar en Latinoamérica',
+  description:
+    'Conecta gratis con profesionales verificados para limpieza, plomería, electricidad y más. México, Argentina, Colombia y Chile.',
 };
 
 export default function RootLayout({
@@ -16,7 +17,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className="min-h-screen bg-slate-50 text-slate-900 antialiased">
+      <body
+        className="min-h-screen antialiased"
+        style={{ backgroundColor: '#F7F3EE', color: '#1A1A2E', fontFamily: 'Inter, sans-serif' }}
+      >
         <Providers>
           <Navbar />
           <main className="min-h-[calc(100vh-8rem)]">{children}</main>

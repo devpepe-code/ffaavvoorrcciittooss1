@@ -10,11 +10,11 @@ const schema = z.object({
   description: z.string().min(2),
   address: z.string().min(2),
   scheduledDate: z.string(),
-  hourlyRate: z.number(),
-  estimatedTotal: z.number(),
-  platformFee: z.number(),
-  trustSupportFee: z.number(),
   estimatedHours: z.number(),
+  hourlyRate: z.number().default(0),
+  estimatedTotal: z.number().default(0),
+  platformFee: z.number().default(0),
+  trustSupportFee: z.number().default(0),
 });
 
 export async function POST(req: Request) {
@@ -29,7 +29,6 @@ export async function POST(req: Request) {
 
     const tasker = await prisma.user.findUnique({
       where: { id: data.taskerId, role: 'TASKER' },
-      include: { taskerProfile: true },
     });
     if (!tasker) {
       return NextResponse.json({ error: 'Tasker no encontrado' }, { status: 404 });
@@ -45,10 +44,10 @@ export async function POST(req: Request) {
         address: data.address,
         scheduledDate: new Date(data.scheduledDate),
         estimatedHours: data.estimatedHours,
-        hourlyRate: data.hourlyRate,
-        estimatedTotal: data.estimatedTotal,
-        platformFee: data.platformFee,
-        trustSupportFee: data.trustSupportFee,
+        hourlyRate: 0,
+        estimatedTotal: 0,
+        platformFee: 0,
+        trustSupportFee: 0,
         status: 'PENDING',
         paymentStatus: 'PENDING',
       },

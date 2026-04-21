@@ -1,30 +1,85 @@
 import Link from 'next/link';
-import { Wrench } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-slate-50">
+    <footer style={{ backgroundColor: '#1A1A2E' }}>
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-        <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-          <Link href="/" className="flex items-center gap-2 font-bold text-amber-600">
-            <Wrench className="h-6 w-6" />
-            Favorcitos
-          </Link>
-          <div className="flex gap-8 text-sm text-slate-600">
-            <Link href="/buscar" className="hover:text-amber-600">
-              Buscar Servicios
+        <div className="flex flex-col gap-8 md:flex-row md:items-start md:justify-between">
+          <div>
+            <Link href="/" className="flex items-center gap-2">
+              <div
+                className="flex h-8 w-8 items-center justify-center rounded-full"
+                style={{ backgroundColor: '#FF6B35' }}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path
+                    d="M8 1.5L9.54 6H14L10.46 8.46 12 13 8 10.5 4 13l1.54-4.54L2 6h4.46L8 1.5z"
+                    fill="white"
+                  />
+                </svg>
+              </div>
+              <span
+                style={{
+                  fontFamily: 'Sora, sans-serif',
+                  fontWeight: 700,
+                  fontSize: '1.15rem',
+                  color: '#FFFFFF',
+                }}
+              >
+                favorcitos
+              </span>
             </Link>
-            <Link href="/login" className="hover:text-amber-600">
-              Iniciar Sesión
-            </Link>
-            <Link href="/registro" className="hover:text-amber-600">
-              Registrarse
-            </Link>
+            <p className="mt-3 max-w-xs text-sm" style={{ color: '#9CA3AF' }}>
+              El favor que necesitas, a un clic de distancia.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-10">
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#6B7280' }}>
+                Plataforma
+              </p>
+              <div className="flex flex-col gap-2">
+                <Link href="/buscar" className="text-sm transition-colors" style={{ color: '#9CA3AF' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#9CA3AF')}
+                >
+                  Buscar Servicios
+                </Link>
+                <Link href="/registro" className="text-sm transition-colors" style={{ color: '#9CA3AF' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#9CA3AF')}
+                >
+                  Registrarse
+                </Link>
+                <Link href="/login" className="text-sm transition-colors" style={{ color: '#9CA3AF' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FFFFFF')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#9CA3AF')}
+                >
+                  Iniciar Sesión
+                </Link>
+              </div>
+            </div>
+            <div>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider" style={{ color: '#6B7280' }}>
+                Países
+              </p>
+              <div className="flex flex-col gap-2 text-sm" style={{ color: '#9CA3AF' }}>
+                <span>🇲🇽 México</span>
+                <span>🇦🇷 Argentina</span>
+                <span>🇨🇴 Colombia</span>
+                <span>🇨🇱 Chile</span>
+              </div>
+            </div>
           </div>
         </div>
-        <p className="mt-8 text-center text-sm text-slate-500">
-          © {new Date().getFullYear()} Favorcitos. Plataforma de servicios para Latinoamérica.
-        </p>
+
+        <div
+          className="mt-10 border-t pt-6 text-center text-sm"
+          style={{ borderColor: 'rgba(255,255,255,0.08)', color: '#6B7280' }}
+        >
+          © {new Date().getFullYear()} Favorcitos. Plataforma de servicios para Latinoamérica. Sin costos, sin comisiones.
+        </div>
       </div>
     </footer>
   );

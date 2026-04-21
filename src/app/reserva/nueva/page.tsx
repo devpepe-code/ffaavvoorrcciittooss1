@@ -12,14 +12,17 @@ function NuevaReservaContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const taskerId = searchParams.get('taskerId');
+  const servicioParam = searchParams.get('servicio') || '';
+
   const [tasker, setTasker] = useState<{
     id: string;
     firstName: string;
     lastName: string;
-    taskerProfile: { hourlyRates: string; services: string } | null;
+    taskerProfile: { services: string } | null;
   } | null>(null);
+
   const [form, setForm] = useState({
-    serviceCategory: '',
+    serviceCategory: servicioParam,
     title: '',
     description: '',
     address: '',
@@ -38,21 +41,6 @@ function NuevaReservaContent() {
       .catch(() => setTasker(null));
   }, [taskerId]);
 
-  const rates = tasker?.taskerProfile?.hourlyRates
-    ? (() => {
-        try {
-          return JSON.parse(tasker.taskerProfile!.hourlyRates) as Record<string, number>;
-        } catch {
-          return {};
-        }
-      })()
-    : {};
-  const hourlyRate = form.serviceCategory ? rates[form.serviceCategory] || 0 : 0;
-  const estimatedTotal = hourlyRate * form.estimatedHours;
-  const platformFee = estimatedTotal * 0.12;
-  const trustFee = estimatedTotal * 0.05;
-  const total = estimatedTotal + platformFee + trustFee;
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!taskerId) return;
@@ -66,22 +54,22 @@ function NuevaReservaContent() {
           taskerId,
           ...form,
           scheduledDate: new Date(`${form.scheduledDate}T${form.scheduledTime}`).toISOString(),
-          hourlyRate,
-          estimatedTotal,
-          platformFee,
-          trustSupportFee: trustFee,
+          hourlyRate: 0,
+          estimatedTotal: 0,
+          platformFee: 0,
+          trustSupportFee: 0,
         }),
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || 'Error al crear reserva');
+        setError(data.error || 'Error al crear la solicitud');
         setLoading(false);
         return;
       }
       router.push(`/reserva/${data.booking.id}`);
       router.refresh();
     } catch {
-      setError('Error al crear reserva');
+      setError('Error al crear la solicitud');
     }
     setLoading(false);
   }
@@ -89,7 +77,7 @@ function NuevaReservaContent() {
   if (!taskerId) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-12 text-center">
-        <p className="text-slate-600">Selecciona un tasker para reservar.</p>
+        <p style={{ color: '#6B7280' }}>Selecciona un tasker para solicitar el servicio.</p>
         <Link href="/buscar" className="mt-4 inline-block">
           <Button>Buscar taskers</Button>
         </Link>
@@ -100,7 +88,7 @@ function NuevaReservaContent() {
   if (!tasker) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-12 text-center">
-        <p className="text-slate-600">Cargando tasker...</p>
+        <p style={{ color: '#6B7280' }}>Cargando tasker...</p>
       </div>
     );
   }
@@ -115,89 +103,121 @@ function NuevaReservaContent() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold">Nueva reserva</h1>
-      <p className="mt-2 text-slate-600">
+      <h1 className="text-2xl font-bold" style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}>
+        Solicitar Servicio
+      </h1>
+      <p className="mt-2" style={{ color: '#6B7280' }}>
         Con {tasker.firstName} {tasker.lastName}
       </p>
 
-      <Card className="mt-8">
+      <Card className="mt-6 rounded-2xl border-0 shadow-sm" style={{ backgroundColor: '#FFFFFF' }}>
         <CardHeader>
-          <h2 className="font-semibold">Detalles del servicio</h2>
+          <h2 className="font-semibold" style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}>
+            Detalles de la solicitud
+          </h2>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</div>
+              <div className="rounded-xl p-3 text-sm" style={{ backgroundColor: '#FEF2F2', color: '#EF4444' }}>
+                {error}
+              </div>
             )}
+
             <div>
-              <label className="mb-1 block text-sm font-medium">Tipo de servicio</label>
+              <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
+                Tipo de servicio
+              </label>
               <select
-                className="h-10 w-full rounded-lg border border-slate-200 px-3"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
                 value={form.serviceCategory}
                 onChange={(e) => setForm((f) => ({ ...f, serviceCategory: e.target.value }))}
                 required
+                aria-label="Tipo de servicio"
               >
-                <option value="">Selecciona</option>
+                <option value="">Selecciona un servicio</option>
                 {services.map((svc) => {
                   const cat = SERVICE_CATEGORIES.find((c) => c.value === svc);
                   return (
                     <option key={svc} value={svc}>
-                      {cat?.label || svc} - ${rates[svc] || 0}/h
+                      {cat?.icon} {cat?.label || svc}
                     </option>
                   );
                 })}
               </select>
             </div>
+
             <div>
-              <label className="mb-1 block text-sm font-medium">Título</label>
+              <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
+                Título breve
+              </label>
               <Input
                 placeholder="Ej: Reparar fuga en el baño"
                 value={form.title}
                 onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
                 required
+                aria-label="Título"
               />
             </div>
+
             <div>
-              <label className="mb-1 block text-sm font-medium">Descripción</label>
+              <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
+                Descripción del trabajo
+              </label>
               <textarea
-                className="min-h-[100px] w-full rounded-lg border border-slate-200 px-3 py-2 text-sm"
-                placeholder="Describe el trabajo a realizar..."
+                className="min-h-[100px] w-full rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
+                placeholder="Describe con detalle lo que necesitas..."
                 value={form.description}
                 onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 required
+                aria-label="Descripción"
               />
             </div>
+
             <div>
-              <label className="mb-1 block text-sm font-medium">Dirección</label>
+              <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
+                Dirección
+              </label>
               <Input
                 placeholder="Dirección donde se realizará el servicio"
                 value={form.address}
                 onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
                 required
+                aria-label="Dirección"
               />
             </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium">Fecha</label>
+                <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
+                  Fecha preferida
+                </label>
                 <Input
                   type="date"
                   value={form.scheduledDate}
                   onChange={(e) => setForm((f) => ({ ...f, scheduledDate: e.target.value }))}
                   required
+                  aria-label="Fecha"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium">Hora</label>
+                <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
+                  Hora
+                </label>
                 <Input
                   type="time"
                   value={form.scheduledTime}
                   onChange={(e) => setForm((f) => ({ ...f, scheduledTime: e.target.value }))}
                   required
+                  aria-label="Hora"
                 />
               </div>
             </div>
+
             <div>
-              <label className="mb-1 block text-sm font-medium">Horas estimadas</label>
+              <label className="mb-1 block text-sm font-medium" style={{ color: '#1A1A2E' }}>
+                Duración estimada (horas)
+              </label>
               <Input
                 type="number"
                 min={1}
@@ -206,33 +226,24 @@ function NuevaReservaContent() {
                 onChange={(e) =>
                   setForm((f) => ({ ...f, estimatedHours: parseFloat(e.target.value) || 1 }))
                 }
+                aria-label="Horas estimadas"
               />
             </div>
 
-            <div className="rounded-lg bg-slate-50 p-4">
-              <p className="text-sm text-slate-600">Resumen de costos</p>
-              <div className="mt-2 space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span>Servicio ({form.estimatedHours}h × ${hourlyRate})</span>
-                  <span>${estimatedTotal} MXN</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Comisión plataforma (12%)</span>
-                  <span>${platformFee.toFixed(2)} MXN</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tarifa de confianza (5%)</span>
-                  <span>${trustFee.toFixed(2)} MXN</span>
-                </div>
-                <div className="flex justify-between font-semibold">
-                  <span>Total</span>
-                  <span>${total.toFixed(2)} MXN</span>
-                </div>
-              </div>
+            <div
+              className="rounded-xl p-4 text-sm"
+              style={{ backgroundColor: '#E8FAF9', color: '#1A1A2E' }}
+            >
+              <p className="font-medium" style={{ color: '#2EC4B6' }}>
+                💬 Sin costos ni comisiones
+              </p>
+              <p className="mt-1" style={{ color: '#6B7280' }}>
+                El precio lo acuerdas directamente con el tasker. Favorcitos es 100% gratuito.
+              </p>
             </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Creando reserva...' : 'Confirmar reserva'}
+            <Button type="submit" className="w-full rounded-xl" size="lg" disabled={loading}>
+              {loading ? 'Enviando solicitud...' : 'Enviar solicitud'}
             </Button>
           </form>
         </CardContent>
@@ -243,7 +254,13 @@ function NuevaReservaContent() {
 
 export default function NuevaReservaPage() {
   return (
-    <Suspense fallback={<div className="mx-auto max-w-2xl px-4 py-12 text-center">Cargando...</div>}>
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-2xl px-4 py-12 text-center" style={{ color: '#6B7280' }}>
+          Cargando...
+        </div>
+      }
+    >
       <NuevaReservaContent />
     </Suspense>
   );

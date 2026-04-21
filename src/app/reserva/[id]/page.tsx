@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { BOOKING_STATUS } from '@/types';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { MapPin, Calendar, User } from 'lucide-react';
 
 export default async function ReservaDetallePage({ params }: { params: { id: string } }) {
   const session = await auth();
@@ -32,77 +33,118 @@ export default async function ReservaDetallePage({ params }: { params: { id: str
     !['COMPLETED', 'CANCELLED'].includes(booking.status) &&
     new Date() < twoHoursBefore;
 
+  const statusColors: Record<string, { bg: string; text: string }> = {
+    COMPLETED: { bg: '#F0FFF4', text: '#22C55E' },
+    CANCELLED: { bg: '#FEF2F2', text: '#EF4444' },
+  };
+  const statusStyle = statusColors[booking.status] || { bg: '#FFF0EB', text: '#FF6B35' };
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{booking.title}</h1>
+      <div className="mb-6 flex items-start justify-between gap-4">
+        <h1
+          className="text-2xl font-bold"
+          style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}
+        >
+          {booking.title}
+        </h1>
         <Badge
-          className={
-            booking.status === 'COMPLETED'
-              ? 'bg-green-100 text-green-800'
-              : booking.status === 'CANCELLED'
-              ? 'bg-red-100 text-red-800'
-              : 'bg-amber-100 text-amber-800'
-          }
+          className="shrink-0 rounded-full px-3 py-1 text-sm"
+          style={{ backgroundColor: statusStyle.bg, color: statusStyle.text, border: 'none' }}
         >
           {(BOOKING_STATUS as Record<string, string>)[booking.status] || booking.status}
         </Badge>
       </div>
 
-      <Card>
+      <Card className="rounded-2xl border-0 shadow-sm" style={{ backgroundColor: '#FFFFFF' }}>
         <CardContent className="p-6">
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <p className="text-sm text-slate-500">Servicio</p>
-              <p className="font-medium">{booking.serviceCategory}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">Descripción</p>
-              <p className="text-slate-700">{booking.description}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">Dirección</p>
-              <p>{booking.address}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">Fecha y hora</p>
-              <p>{new Date(booking.scheduledDate).toLocaleString('es')}</p>
-            </div>
-            <div>
-              <p className="text-sm text-slate-500">
-                {isClient ? 'Tasker asignado' : 'Cliente'}
+              <p className="text-xs font-medium uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
+                Servicio
               </p>
-              <p className="font-medium">
-                {otherUser.firstName} {otherUser.lastName}
+              <p className="mt-1 font-medium" style={{ color: '#1A1A2E' }}>
+                {booking.serviceCategory}
               </p>
-              <p className="text-sm text-slate-600">{otherUser.email}</p>
             </div>
-            <div className="border-t pt-4">
-              <p className="text-sm text-slate-500">Resumen de pago</p>
-              <div className="mt-2 space-y-1">
-                <div className="flex justify-between">
-                  <span>Servicio ({booking.estimatedHours}h)</span>
-                  <span>${booking.estimatedTotal} MXN</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Comisión</span>
-                  <span>${booking.platformFee + booking.trustSupportFee} MXN</span>
-                </div>
-                <div className="flex justify-between font-semibold">
-                  <span>Total</span>
-                  <span>${booking.estimatedTotal + booking.platformFee + booking.trustSupportFee} MXN</span>
-                </div>
+
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
+                Descripción
+              </p>
+              <p className="mt-1 text-sm leading-relaxed" style={{ color: '#6B7280' }}>
+                {booking.description}
+              </p>
+            </div>
+
+            <div className="flex items-start gap-2">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0" style={{ color: '#FF6B35' }} />
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
+                  Dirección
+                </p>
+                <p className="mt-1 text-sm" style={{ color: '#1A1A2E' }}>
+                  {booking.address}
+                </p>
               </div>
+            </div>
+
+            <div className="flex items-start gap-2">
+              <Calendar className="mt-0.5 h-4 w-4 shrink-0" style={{ color: '#FF6B35' }} />
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
+                  Fecha y hora
+                </p>
+                <p className="mt-1 text-sm" style={{ color: '#1A1A2E' }}>
+                  {new Date(booking.scheduledDate).toLocaleString('es', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2">
+              <User className="mt-0.5 h-4 w-4 shrink-0" style={{ color: '#FF6B35' }} />
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider" style={{ color: '#9CA3AF' }}>
+                  {isClient ? 'Tasker asignado' : 'Cliente'}
+                </p>
+                <p className="mt-1 font-medium" style={{ color: '#1A1A2E' }}>
+                  {otherUser.firstName} {otherUser.lastName}
+                </p>
+                <p className="text-sm" style={{ color: '#6B7280' }}>
+                  {otherUser.email}
+                </p>
+              </div>
+            </div>
+
+            <div
+              className="rounded-xl p-4 text-sm"
+              style={{ backgroundColor: '#E8FAF9' }}
+            >
+              <p className="font-medium" style={{ color: '#2EC4B6' }}>
+                💬 Acuerda el precio directamente con el tasker
+              </p>
+              <p className="mt-1" style={{ color: '#6B7280' }}>
+                Favorcitos es 100% gratuito — sin comisiones ni tarifas.
+              </p>
             </div>
           </div>
 
           {!['COMPLETED', 'CANCELLED'].includes(booking.status) && isTasker && (
-            <div className="mt-6 flex gap-2">
-              <form action={`/api/bookings/${booking.id}/accept`} method="POST">
-                <Button type="submit">Aceptar reserva</Button>
+            <div className="mt-6 flex gap-3">
+              <form action={`/api/bookings/${booking.id}/accept`} method="POST" className="flex-1">
+                <Button type="submit" className="w-full rounded-xl">
+                  Aceptar solicitud
+                </Button>
               </form>
               <form action={`/api/bookings/${booking.id}/reject`} method="POST">
-                <Button type="submit" variant="destructive">
+                <Button type="submit" variant="destructive" className="rounded-xl">
                   Rechazar
                 </Button>
               </form>
@@ -113,21 +155,23 @@ export default async function ReservaDetallePage({ params }: { params: { id: str
             !['COMPLETED', 'CANCELLED'].includes(booking.status) &&
             !canCancel &&
             new Date() >= twoHoursBefore && (
-              <p className="mt-6 text-sm text-slate-500">
+              <p className="mt-4 text-xs" style={{ color: '#9CA3AF' }}>
                 No se puede cancelar menos de 2 horas antes del inicio del servicio.
               </p>
             )}
         </CardContent>
       </Card>
 
-      <div className="mt-6 flex justify-between items-center">
+      <div className="mt-6 flex items-center justify-between">
         <Link href={isClient ? '/cliente/mis-reservas' : '/tasker/dashboard'}>
-          <Button variant="outline">← Volver</Button>
+          <Button variant="outline" className="rounded-xl">
+            ← Volver
+          </Button>
         </Link>
         {canCancel && (
           <form action={`/api/bookings/${booking.id}/cancel`} method="POST">
-            <Button type="submit" variant="destructive">
-              Cancelar reserva
+            <Button type="submit" variant="destructive" className="rounded-xl">
+              Cancelar solicitud
             </Button>
           </form>
         )}

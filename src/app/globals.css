@@ -1,23 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #F7F3EE;
+  --foreground: #1A1A2E;
+  --brand-primary: #FF6B35;
+  --brand-secondary: #2EC4B6;
+  --brand-accent: #FFE66D;
+  --brand-dark: #1A1A2E;
+  --brand-light: #F7F3EE;
+  --brand-gray: #6B7280;
+  --brand-success: #22C55E;
+  --brand-error: #EF4444;
+  --brand-white: #FFFFFF;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Sora', Arial, sans-serif;
 }
 
 @layer utilities {

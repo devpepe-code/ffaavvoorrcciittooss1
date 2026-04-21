@@ -1,106 +1,234 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { SERVICE_CATEGORIES } from '@/types';
-import { Wrench, Shield, CreditCard, Star } from 'lucide-react';
+import { Shield, Star, MessageSquare, Users } from 'lucide-react';
+
+const CATEGORY_COLORS = [
+  { bg: '#FFF0EB', border: '#FFCAB5' },
+  { bg: '#E8FAF9', border: '#A0ECE7' },
+  { bg: '#FFFBE6', border: '#FFE9A0' },
+  { bg: '#F0F9FF', border: '#A0D9F0' },
+  { bg: '#F9F0FF', border: '#D4A0F0' },
+  { bg: '#F0FFF4', border: '#A0E6B4' },
+  { bg: '#FFF5E6', border: '#FFD4A0' },
+  { bg: '#EBF5FF', border: '#A0C8F0' },
+  { bg: '#FFF0F3', border: '#F0A0B4' },
+  { bg: '#F4FFF4', border: '#A0E6B4' },
+];
+
+const WHY_ITEMS = [
+  {
+    icon: <Shield className="h-10 w-10" style={{ color: '#FF6B35' }} />,
+    title: 'Taskers Verificados',
+    desc: 'Todos nuestros taskers pasan verificación de identidad y antecedentes.',
+  },
+  {
+    icon: <MessageSquare className="h-10 w-10" style={{ color: '#2EC4B6' }} />,
+    title: 'Contacto Directo',
+    desc: 'Habla directo con tu tasker sin intermediarios — sin costos, sin comisiones.',
+  },
+  {
+    icon: <Star className="h-10 w-10" style={{ color: '#FF6B35' }} />,
+    title: 'Calificaciones Reales',
+    desc: 'Lee reseñas de clientes reales antes de contratar. Transparencia total.',
+  },
+  {
+    icon: <Users className="h-10 w-10" style={{ color: '#2EC4B6' }} />,
+    title: 'Hecho para LatAm',
+    desc: 'Diseñado para México, Argentina, Colombia y Chile.',
+  },
+];
 
 export default function HomePage() {
   return (
     <div>
-      <section className="relative overflow-hidden bg-gradient-to-br from-amber-500 via-amber-600 to-orange-700 px-4 py-24 sm:px-6 sm:py-32">
+      {/* Hero */}
+      <section
+        className="relative overflow-hidden px-4 py-24 sm:px-6 sm:py-36"
+        style={{ background: 'linear-gradient(135deg, #FF6B35 0%, #1A1A2E 100%)' }}
+      >
         <div className="mx-auto max-w-7xl text-center">
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-            Servicios del hogar,{' '}
-            <span className="text-amber-100">cuando los necesites</span>
+          <h1
+            className="text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl"
+            style={{ fontFamily: 'Sora, sans-serif' }}
+          >
+            Tu hogar, en las{' '}
+            <span style={{ color: '#FFE66D' }}>mejores manos</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-amber-100">
-            Conectamos a personas que necesitan ayuda con profesionales verificados en México, Brasil,
-            Argentina, Colombia y Chile.
+          <p className="mx-auto mt-6 max-w-2xl text-lg" style={{ color: 'rgba(255,255,255,0.8)' }}>
+            Conecta gratis con profesionales verificados de limpieza, plomería, electricidad y más
+            — en México, Argentina, Colombia y Chile.
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Link href="/buscar">
-              <Button size="lg" className="bg-white text-amber-600 hover:bg-amber-50">
+              <Button
+                size="lg"
+                className="rounded-xl font-semibold"
+                style={{ backgroundColor: '#FFFFFF', color: '#FF6B35' }}
+              >
                 Buscar Servicios
               </Button>
             </Link>
             <Link href="/registro">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button
+                size="lg"
+                variant="outline"
+                className="rounded-xl border-white font-semibold"
+                style={{ color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.7)' }}
+              >
                 Ofrecer Servicios
               </Button>
             </Link>
           </div>
+          <p className="mt-6 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            100% gratis · Sin comisiones · Sin tarjeta de crédito
+          </p>
         </div>
       </section>
 
+      {/* Categories */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <h2 className="text-center text-2xl font-bold text-slate-900 sm:text-3xl">
+        <h2
+          className="text-center text-2xl font-bold sm:text-3xl"
+          style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}
+        >
           ¿Qué servicio necesitas?
         </h2>
+        <p className="mt-2 text-center text-sm" style={{ color: '#6B7280' }}>
+          Encuentra un profesional para cada tarea del hogar
+        </p>
         <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {SERVICE_CATEGORIES.slice(0, 10).map((cat) => (
-            <Link
-              key={cat.value}
-              href={`/buscar?categoria=${cat.value}`}
-              className="flex flex-col items-center rounded-xl border border-slate-200 bg-white p-6 transition hover:border-amber-300 hover:shadow-md"
-            >
-              <span className="text-3xl">{cat.icon}</span>
-              <span className="mt-2 text-center text-sm font-medium text-slate-700">
-                {cat.label}
-              </span>
-            </Link>
-          ))}
+          {SERVICE_CATEGORIES.slice(0, 10).map((cat, i) => {
+            const { bg, border } = CATEGORY_COLORS[i % CATEGORY_COLORS.length];
+            return (
+              <Link
+                key={cat.value}
+                href={`/buscar?categoria=${cat.value}`}
+                className="group flex flex-col items-center rounded-2xl border p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                style={{ backgroundColor: bg, borderColor: border }}
+              >
+                <span
+                  className="flex h-12 w-12 items-center justify-center rounded-full text-2xl"
+                  style={{ backgroundColor: '#FFE66D' }}
+                >
+                  {cat.icon}
+                </span>
+                <span
+                  className="mt-3 text-center text-sm font-semibold"
+                  style={{ color: '#1A1A2E' }}
+                >
+                  {cat.label}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
-      <section className="bg-slate-100 px-4 py-16 sm:px-6">
+      {/* Why Favorcitos */}
+      <section className="px-4 py-16 sm:px-6" style={{ backgroundColor: '#FFFFFF' }}>
         <div className="mx-auto max-w-7xl">
-          <h2 className="text-center text-2xl font-bold text-slate-900 sm:text-3xl">
+          <h2
+            className="text-center text-2xl font-bold sm:text-3xl"
+            style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}
+          >
             ¿Por qué Favorcitos?
           </h2>
-          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="flex flex-col items-center rounded-xl bg-white p-6 text-center shadow-sm">
-              <Shield className="h-12 w-12 text-amber-500" />
-              <h3 className="mt-4 font-semibold">Verificación</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Todos nuestros taskers pasan verificación de identidad y antecedentes.
-              </p>
-            </div>
-            <div className="flex flex-col items-center rounded-xl bg-white p-6 text-center shadow-sm">
-              <CreditCard className="h-12 w-12 text-amber-500" />
-              <h3 className="mt-4 font-semibold">Pagos Seguros</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Pagos en escrow. Tu dinero está protegido hasta que el trabajo esté completo.
-              </p>
-            </div>
-            <div className="flex flex-col items-center rounded-xl bg-white p-6 text-center shadow-sm">
-              <Star className="h-12 w-12 text-amber-500" />
-              <h3 className="mt-4 font-semibold">Calificaciones</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Lee reseñas reales de otros clientes antes de contratar.
-              </p>
-            </div>
-            <div className="flex flex-col items-center rounded-xl bg-white p-6 text-center shadow-sm">
-              <Wrench className="h-12 w-12 text-amber-500" />
-              <h3 className="mt-4 font-semibold">Favorcitos</h3>
-              <p className="mt-2 text-sm text-slate-600">
-                Optimizado para México, Brasil, Argentina, Colombia y Chile.
-              </p>
-            </div>
+          <p className="mt-2 text-center text-sm" style={{ color: '#6B7280' }}>
+            La plataforma más directa para servicios del hogar en Latinoamérica
+          </p>
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {WHY_ITEMS.map((item) => (
+              <div
+                key={item.title}
+                className="flex flex-col items-center rounded-2xl p-6 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
+                style={{
+                  backgroundColor: '#F7F3EE',
+                  border: '1px solid rgba(0,0,0,0.06)',
+                }}
+              >
+                {item.icon}
+                <h3
+                  className="mt-4 font-semibold"
+                  style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}
+                >
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm" style={{ color: '#6B7280' }}>
+                  {item.desc}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6">
-        <h2 className="text-2xl font-bold text-slate-900">¿Listo para empezar?</h2>
-        <p className="mt-4 text-slate-600">
+      {/* How it works */}
+      <section className="px-4 py-16 sm:px-6" style={{ backgroundColor: '#F7F3EE' }}>
+        <div className="mx-auto max-w-4xl text-center">
+          <h2
+            className="text-2xl font-bold sm:text-3xl"
+            style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}
+          >
+            Tan fácil como pedir un favor
+          </h2>
+          <div className="mt-10 grid gap-8 sm:grid-cols-3">
+            {[
+              { step: '1', emoji: '🔍', title: 'Busca', desc: 'Filtra por servicio y ciudad. Ve perfiles, ratings y reseñas.' },
+              { step: '2', emoji: '📱', title: 'Contacta', desc: 'Habla directo con el tasker. Sin intermediarios.' },
+              { step: '3', emoji: '✅', title: 'Listo', desc: 'El servicio se realiza y dejas tu reseña. Así de simple.' },
+            ].map((s) => (
+              <div key={s.step} className="flex flex-col items-center">
+                <div
+                  className="flex h-14 w-14 items-center justify-center rounded-full text-2xl font-bold text-white"
+                  style={{ backgroundColor: '#FF6B35' }}
+                >
+                  {s.emoji}
+                </div>
+                <h3 className="mt-4 font-semibold" style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}>
+                  {s.title}
+                </h3>
+                <p className="mt-2 text-sm" style={{ color: '#6B7280' }}>
+                  {s.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section
+        className="px-4 py-20 text-center sm:px-6"
+        style={{ background: 'linear-gradient(135deg, #FF6B35 0%, #1A1A2E 100%)' }}
+      >
+        <h2
+          className="text-2xl font-bold text-white sm:text-3xl"
+          style={{ fontFamily: 'Sora, sans-serif' }}
+        >
+          ¿Listo para empezar?
+        </h2>
+        <p className="mt-4 text-lg" style={{ color: 'rgba(255,255,255,0.8)' }}>
           Regístrate gratis y encuentra el profesional que necesitas en minutos.
         </p>
-        <div className="mt-8 flex justify-center gap-4">
+        <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <Link href="/registro">
-            <Button size="lg">Crear cuenta gratis</Button>
+            <Button
+              size="lg"
+              className="rounded-xl px-8 font-semibold"
+              style={{ backgroundColor: '#FFFFFF', color: '#FF6B35' }}
+            >
+              Crear cuenta gratis
+            </Button>
           </Link>
-          <Link href="/login">
-            <Button size="lg" variant="outline">
-              Ya tengo cuenta
+          <Link href="/buscar">
+            <Button
+              size="lg"
+              variant="outline"
+              className="rounded-xl border-white px-8 font-semibold"
+              style={{ color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.7)' }}
+            >
+              Explorar servicios
             </Button>
           </Link>
         </div>
