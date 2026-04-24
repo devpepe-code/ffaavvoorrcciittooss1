@@ -5,9 +5,9 @@ import { Footer } from '@/components/shared/Footer';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Favorcitos - Servicios del Hogar en Latinoamérica',
+  title: 'Favorcitos - Servicios del Hogar en México',
   description:
-    'Conecta gratis con profesionales verificados para limpieza, plomería, electricidad y más. México, Argentina, Colombia y Chile.',
+    'Conecta gratis con profesionales verificados para limpieza, plomería, electricidad y más en México. Sin costos, sin comisiones.',
 };
 
 export default function RootLayout({

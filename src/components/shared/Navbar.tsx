@@ -72,9 +72,7 @@ export function Navbar() {
           </Link>
 
           {status === 'loading' ? (
-            <span className="text-sm" style={{ color: '#9CA3AF' }}>
-              Cargando...
-            </span>
+            <span className="inline-block h-8 w-32 animate-pulse rounded-lg" style={{ backgroundColor: '#F3F4F6' }} />
           ) : session ? (
             <>
               <Link

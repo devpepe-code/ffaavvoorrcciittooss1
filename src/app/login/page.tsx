@@ -153,13 +153,6 @@ function LoginContent() {
               Regístrate gratis
             </Link>
           </p>
-          <div
-            className="mt-4 rounded-xl p-3 text-center text-xs"
-            style={{ backgroundColor: '#F7F3EE', color: '#6B7280' }}
-          >
-            Demo: <strong>cliente@test.com</strong> / <strong>tasker@test.com</strong>
-            {' '}— contraseña: <strong>password123</strong>
-          </div>
         </CardContent>
       </Card>
     </div>
@@ -170,8 +163,15 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-md px-4 py-12 text-center" style={{ color: '#6B7280' }}>
-          Cargando...
+        <div className="mx-auto max-w-md px-4 py-12">
+          <div className="animate-pulse rounded-2xl bg-white p-8 shadow-lg">
+            <div className="mb-4 h-6 w-40 rounded bg-slate-200" />
+            <div className="space-y-3">
+              <div className="h-10 rounded-lg bg-slate-100" />
+              <div className="h-10 rounded-lg bg-slate-100" />
+              <div className="h-10 rounded-xl bg-slate-100" />
+            </div>
+          </div>
         </div>
       }
     >

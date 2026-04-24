@@ -87,8 +87,11 @@ function NuevaReservaContent() {
 
   if (!tasker) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-12 text-center">
-        <p style={{ color: '#6B7280' }}>Cargando tasker...</p>
+      <div className="mx-auto max-w-2xl px-4 py-12">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 w-48 rounded bg-slate-200" />
+          <div className="h-64 rounded-2xl bg-white shadow-sm" />
+        </div>
       </div>
     );
   }
@@ -256,8 +259,11 @@ export default function NuevaReservaPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-2xl px-4 py-12 text-center" style={{ color: '#6B7280' }}>
-          Cargando...
+        <div className="mx-auto max-w-2xl px-4 py-12">
+          <div className="animate-pulse space-y-4">
+            <div className="h-6 w-48 rounded bg-slate-200" />
+            <div className="h-64 rounded-2xl bg-white shadow-sm" />
+          </div>
         </div>
       }
     >
