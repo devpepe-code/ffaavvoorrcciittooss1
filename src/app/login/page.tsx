@@ -24,16 +24,28 @@ function LoginContent() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    const result = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
-    if (result?.error) {
-      setError('Email o contraseña incorrectos. Verifica tus datos e intenta de nuevo.');
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      });
+      if (!result || result.error) {
+        setError('Email o contraseña incorrectos. Verifica tus datos e intenta de nuevo.');
+        setLoading(false);
+      } else {
+        // Use full navigation so the server receives the new session cookie
+        // Only allow same-origin redirects to prevent open redirect attacks
+        try {
+          const target = new URL(callbackUrl, window.location.origin);
+          window.location.href = target.origin === window.location.origin ? target.pathname : '/dashboard';
+        } catch {
+          window.location.href = '/dashboard';
+        }
+      }
+    } catch {
+      setError('Error al conectar. Intenta de nuevo en unos segundos.');
       setLoading(false);
-    } else {
-      window.location.href = callbackUrl;
     }
   }
 
