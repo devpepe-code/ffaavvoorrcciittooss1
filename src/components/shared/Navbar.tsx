@@ -75,16 +75,18 @@ export function Navbar() {
             <span className="inline-block h-8 w-32 animate-pulse rounded-lg" style={{ backgroundColor: '#F3F4F6' }} />
           ) : session ? (
             <>
-              <Link
-                href={reservasHref}
-                className="flex items-center gap-1 text-sm font-medium transition-colors"
-                style={{ color: '#6B7280' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = '#FF6B35')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
-              >
-                <CalendarDays className="h-4 w-4" />
-                {reservasLabel}
-              </Link>
+              {role !== 'TASKER' && (
+                <Link
+                  href={reservasHref}
+                  className="flex items-center gap-1 text-sm font-medium transition-colors"
+                  style={{ color: '#6B7280' }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#FF6B35')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#6B7280')}
+                >
+                  <CalendarDays className="h-4 w-4" />
+                  {reservasLabel}
+                </Link>
+              )}
               <Link href={dashHref}>
                 <Button size="sm" variant="outline">
                   <LayoutDashboard className="mr-1 h-4 w-4" />
@@ -146,14 +148,16 @@ export function Navbar() {
             </Link>
             {session ? (
               <>
-                <Link
-                  href={reservasHref}
-                  className="text-sm font-medium"
-                  style={{ color: '#6B7280' }}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {reservasLabel}
-                </Link>
+                {role !== 'TASKER' && (
+                  <Link
+                    href={reservasHref}
+                    className="text-sm font-medium"
+                    style={{ color: '#6B7280' }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {reservasLabel}
+                  </Link>
+                )}
                 <Link href={dashHref} onClick={() => setMenuOpen(false)}>
                   <Button size="sm" variant="outline" className="w-full">
                     <LayoutDashboard className="mr-1 h-4 w-4" />
