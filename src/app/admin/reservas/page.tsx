@@ -17,58 +17,66 @@ export default async function AdminReservasPage() {
     take: 50,
   });
 
+  const statusStyle = (status: string) => {
+    if (status === 'COMPLETED') return { backgroundColor: '#F0FFF4', color: '#22C55E' };
+    if (status === 'CANCELLED') return { backgroundColor: '#FEF2F2', color: '#EF4444' };
+    return { backgroundColor: '#FFF0EB', color: '#FF6B35' };
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <h1 className="text-2xl font-bold">Reservas</h1>
-      <p className="mt-2 text-slate-600">Todas las reservas de la plataforma</p>
+      <h1 className="text-2xl font-bold" style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}>
+        Reservas
+      </h1>
+      <p className="mt-2" style={{ color: '#6B7280' }}>Todas las reservas de la plataforma</p>
 
-      <Card className="mt-8">
+      <Card className="mt-8 rounded-2xl border-0 shadow-sm" style={{ backgroundColor: '#FFFFFF' }}>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b bg-slate-50">
-                  <th className="px-4 py-3 text-left text-sm font-medium">Título</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Cliente</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Tasker</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Estado</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Total</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium">Fecha</th>
+                <tr className="border-b" style={{ borderColor: 'rgba(0,0,0,0.06)', backgroundColor: '#FAFAF9' }}>
+                  {['Título', 'Cliente', 'Tasker', 'Estado', 'Fecha'].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: '#6B7280' }}>
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {bookings.map((b) => (
-                  <tr key={b.id} className="border-b last:border-0">
+                  <tr key={b.id} className="border-b last:border-0" style={{ borderColor: 'rgba(0,0,0,0.04)' }}>
                     <td className="px-4 py-3">
-                      <Link href={`/reserva/${b.id}`} className="font-medium text-amber-600 hover:underline">
+                      <Link href={`/reserva/${b.id}`} className="font-medium hover:underline" style={{ color: '#FF6B35' }}>
                         {b.title}
                       </Link>
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-sm" style={{ color: '#1A1A2E' }}>
                       {b.client.firstName} {b.client.lastName}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3 text-sm" style={{ color: '#1A1A2E' }}>
                       {b.tasker.firstName} {b.tasker.lastName}
                     </td>
                     <td className="px-4 py-3">
                       <Badge
-                        className={
-                          b.status === 'COMPLETED'
-                            ? 'bg-green-100 text-green-800'
-                            : b.status === 'CANCELLED'
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-amber-100 text-amber-800'
-                        }
+                        className="rounded-full px-2 py-0.5 text-xs"
+                        style={{ ...statusStyle(b.status), border: 'none' }}
                       >
                         {(BOOKING_STATUS as Record<string, string>)[b.status] || b.status}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3">${b.estimatedTotal} MXN</td>
-                    <td className="px-4 py-3 text-sm text-slate-500">
-                      {new Date(b.scheduledDate).toLocaleDateString('es')}
+                    <td className="px-4 py-3 text-sm" style={{ color: '#6B7280' }}>
+                      {new Date(b.scheduledDate).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </td>
                   </tr>
                 ))}
+                {bookings.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="px-4 py-12 text-center text-sm" style={{ color: '#9CA3AF' }}>
+                      No hay reservas aún.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

@@ -6,26 +6,29 @@ export async function POST(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-  }
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
 
-  const booking = await prisma.booking.findUnique({
-    where: { id: params.id },
-  });
-  if (!booking) return NextResponse.json({ error: 'No encontrado' }, { status: 404 });
-  if (booking.taskerId !== (session.user as { id: string }).id) {
-    return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
-  }
-  if (booking.status !== 'PENDING') {
-    return NextResponse.json({ error: 'Reserva ya procesada' }, { status: 400 });
-  }
+    const booking = await prisma.booking.findUnique({ where: { id: params.id } });
+    if (!booking) return NextResponse.json({ error: 'No encontrado' }, { status: 404 });
+    if (booking.taskerId !== (session.user as { id: string }).id) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 403 });
+    }
+    if (booking.status !== 'PENDING') {
+      return NextResponse.json({ error: 'Reserva ya procesada' }, { status: 400 });
+    }
 
-  await prisma.booking.update({
-    where: { id: params.id },
-    data: { status: 'CONFIRMED', paymentStatus: 'AUTHORIZED' },
-  });
+    await prisma.booking.update({
+      where: { id: params.id },
+      data: { status: 'CONFIRMED', paymentStatus: 'AUTHORIZED' },
+    });
 
-  return NextResponse.redirect(new URL('/tasker/dashboard', req.url));
+    return NextResponse.redirect(new URL('/tasker/dashboard', req.url));
+  } catch (e) {
+    console.error('[POST /api/bookings/[id]/accept]', e);
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+  }
 }

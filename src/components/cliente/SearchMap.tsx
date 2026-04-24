@@ -112,9 +112,7 @@ export function SearchMap({ taskers, onTaskerClick, userLocation: externalUserLo
 
   if (!isLoaded) {
     return (
-      <div className="flex h-[420px] animate-pulse items-center justify-center rounded-xl border border-slate-200 bg-slate-50">
-        <p className="text-sm" style={{ color: '#9CA3AF' }}>Cargando mapa...</p>
-      </div>
+      <div className="h-[420px] animate-pulse rounded-xl" style={{ backgroundColor: '#F3F4F6' }} />
     );
   }
 

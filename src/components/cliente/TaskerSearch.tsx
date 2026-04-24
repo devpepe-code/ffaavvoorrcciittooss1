@@ -52,6 +52,7 @@ export function TaskerSearch() {
   }, [categoriaParam]);
 
   useEffect(() => {
+    const controller = new AbortController();
     async function fetchTaskers() {
       setLoading(true);
       setFetchError(false);
@@ -60,10 +61,12 @@ export function TaskerSearch() {
         if (categoria) params.set('categoria', categoria);
         if (estado) params.set('estado', estado);
         if (ciudad) params.set('ciudad', ciudad);
-        const res = await fetch(`/api/taskers/search?${params}`);
+        const res = await fetch(`/api/taskers/search?${params}`, { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         setTaskers(data.taskers || []);
-      } catch {
+      } catch (err) {
+        if ((err as Error).name === 'AbortError') return;
         setFetchError(true);
         setTaskers([]);
       } finally {
@@ -71,6 +74,7 @@ export function TaskerSearch() {
       }
     }
     fetchTaskers();
+    return () => controller.abort();
   }, [categoria, estado, ciudad]);
 
   const ciudades = estado ? (CIUDADES_POR_ESTADO[estado] || []) : [];

@@ -70,7 +70,7 @@ export function Footer() {
           className="mt-10 border-t pt-6 text-center text-sm"
           style={{ borderColor: 'rgba(255,255,255,0.08)', color: '#6B7280' }}
         >
-          © {new Date().getFullYear()} Favorcitos. La plataforma de servicios del hogar en México. Sin costos, sin comisiones.
+          © {new Date().getFullYear()} Favorcitos · Hecho en México 🇲🇽 · Sin costos, sin comisiones.
         </div>
       </div>
     </footer>
