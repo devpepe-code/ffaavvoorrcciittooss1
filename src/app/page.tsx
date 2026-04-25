@@ -52,8 +52,7 @@ export default function HomePage() {
             className="text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl"
             style={{ fontFamily: 'Sora, sans-serif' }}
           >
-            Tu hogar, en las{' '}
-            <span style={{ color: '#FFE66D' }}>mejores manos</span>
+            agent is connected
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg" style={{ color: 'rgba(255,255,255,0.8)' }}>
             Conecta gratis con profesionales verificados de limpieza, plomería, electricidad y más
