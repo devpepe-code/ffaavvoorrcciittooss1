@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
-    "build": "node scripts/ensure-env.js && prisma generate && prisma migrate deploy && prisma db seed && next build",
+    "build": "node scripts/ensure-env.js && prisma generate && next build",
     "start": "next start -p 3001",
     "lint": "next lint",
     "db:seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
