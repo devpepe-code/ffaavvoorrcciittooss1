@@ -41,17 +41,20 @@ export function TaskerSearch() {
   const [estado, setEstado] = useState('');
   const [ciudad, setCiudad] = useState('');
   const [taskers, setTaskers] = useState<Tasker[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [hasSearched, setHasSearched] = useState(!!categoriaParam);
 
   const geo = useGeolocation();
 
   useEffect(() => {
     setCategoria(categoriaParam);
+    if (categoriaParam) setHasSearched(true);
   }, [categoriaParam]);
 
   useEffect(() => {
+    if (!hasSearched) return;
     const controller = new AbortController();
     async function fetchTaskers() {
       setLoading(true);
@@ -75,7 +78,7 @@ export function TaskerSearch() {
     }
     fetchTaskers();
     return () => controller.abort();
-  }, [categoria, estado, ciudad]);
+  }, [categoria, estado, ciudad, hasSearched]);
 
   const ciudades = estado ? (CIUDADES_POR_ESTADO[estado] || []) : [];
 
@@ -104,13 +107,13 @@ export function TaskerSearch() {
               Categoría
             </label>
             <select
-              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
+              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F97316]"
               value={categoria}
-              onChange={(e) => setCategoria(e.target.value)}
+              onChange={(e) => { setCategoria(e.target.value); setHasSearched(true); }}
               aria-label="Filtrar por categoría"
             >
               <option value="">Todas las categorías</option>
-              {SERVICE_CATEGORIES.map((c) => (
+              {SERVICE_CATEGORIES.filter((c) => c.value !== 'OTRO').map((c) => (
                 <option key={c.value} value={c.value}>
                   {c.icon} {c.label}
                 </option>
@@ -122,9 +125,9 @@ export function TaskerSearch() {
               Estado
             </label>
             <select
-              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
+              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F97316]"
               value={estado}
-              onChange={(e) => { setEstado(e.target.value); setCiudad(''); }}
+              onChange={(e) => { setEstado(e.target.value); setCiudad(''); setHasSearched(true); }}
               aria-label="Filtrar por estado"
             >
               <option value="">Todos los estados</option>
@@ -139,9 +142,9 @@ export function TaskerSearch() {
             </label>
             {estado ? (
               <select
-                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#FF6B35]"
+                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#F97316]"
                 value={ciudad}
-                onChange={(e) => setCiudad(e.target.value)}
+                onChange={(e) => { setCiudad(e.target.value); setHasSearched(true); }}
                 aria-label="Filtrar por ciudad"
               >
                 <option value="">Todas las ciudades</option>
@@ -223,8 +226,21 @@ export function TaskerSearch() {
         </div>
       )}
 
-      {/* Results */}
-      {loading ? (
+      {/* Empty state - no search yet */}
+      {!hasSearched ? (
+        <div
+          className="flex flex-col items-center rounded-2xl border border-dashed p-12 text-center"
+          style={{ borderColor: '#D1D5DB' }}
+        >
+          <Search className="h-12 w-12" style={{ color: '#9CA3AF' }} />
+          <p className="mt-4 font-medium" style={{ color: '#1A1A2E' }}>
+            Usa los filtros para encontrar a tu tasker ideal
+          </p>
+          <p className="mt-2 text-sm" style={{ color: '#6B7280' }}>
+            Selecciona una categoría, estado o ciudad para comenzar.
+          </p>
+        </div>
+      ) : loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <Card key={i} className="animate-pulse rounded-2xl">
@@ -297,7 +313,7 @@ export function TaskerSearch() {
                         {t.firstName} {t.lastName}
                       </h3>
                       <div className="mt-1 flex items-center gap-2 text-sm" style={{ color: '#6B7280' }}>
-                        <Star className="h-4 w-4 fill-[#FF6B35] text-[#FF6B35]" />
+                        <Star className="h-4 w-4 fill-[#F97316] text-[#F97316]" />
                         <span className="font-medium">
                           {t.taskerProfile?.averageRating.toFixed(1) || '-'}
                         </span>
