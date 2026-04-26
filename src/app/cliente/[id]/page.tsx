@@ -14,23 +14,25 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 export default async function ClienteProfilePage({ params }: { params: { id: string } }) {
   const user = await prisma.user.findUnique({
     where: { id: params.id },
-    include: {
-      reviewsReceived: {
+  });
+
+  const reviewsReceived = user
+    ? await prisma.review.findMany({
+        where: { reviewedId: params.id },
         orderBy: { createdAt: 'desc' },
         take: 5,
-      },
-    },
-  });
+      })
+    : [];
 
   if (!user || user.role !== 'CLIENTE') {
     notFound();
   }
 
   const avgRating =
-    user.reviewsReceived.length > 0
+    reviewsReceived.length > 0
       ? (
-          user.reviewsReceived.reduce((sum, r) => sum + r.overallRating, 0) /
-          user.reviewsReceived.length
+          reviewsReceived.reduce((sum, r) => sum + r.overallRating, 0) /
+          reviewsReceived.length
         ).toFixed(1)
       : '-';
 
@@ -71,7 +73,7 @@ export default async function ClienteProfilePage({ params }: { params: { id: str
                   Reseñas
                 </p>
                 <p className="mt-2 text-2xl font-bold" style={{ color: '#1A1A2E' }}>
-                  {user.reviewsReceived.length}
+                  {reviewsReceived.length}
                 </p>
               </div>
             </div>
@@ -84,7 +86,7 @@ export default async function ClienteProfilePage({ params }: { params: { id: str
       </Card>
 
       {/* Reviews */}
-      {user.reviewsReceived.length > 0 && (
+      {reviewsReceived.length > 0 && (
         <Card className="mt-6 rounded-2xl border-0 shadow-sm" style={{ backgroundColor: '#FFFFFF' }}>
           <CardHeader>
             <h2 className="font-bold" style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}>
@@ -93,7 +95,7 @@ export default async function ClienteProfilePage({ params }: { params: { id: str
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {user.reviewsReceived.map((r) => (
+              {reviewsReceived.map((r) => (
                 <div key={r.id} className="rounded-xl p-4" style={{ backgroundColor: '#FAFAF9' }}>
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
