@@ -1,11 +1,16 @@
 import NextAuth from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
 import { prisma } from './db';
 import { authConfig } from './auth.config';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   ...authConfig,
   providers: [
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
     Credentials({
       name: 'credentials',
       credentials: {
@@ -31,4 +36,48 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    ...authConfig.callbacks,
+    async signIn({ user, account }) {
+      if (account?.provider === 'google') {
+        const existing = await prisma.user.findUnique({ where: { email: user.email! } });
+        if (!existing) {
+          const parts = (user.name || 'Usuario').split(' ');
+          await prisma.user.create({
+            data: {
+              email: user.email!,
+              firstName: parts[0],
+              lastName: parts.slice(1).join(' ') || '',
+              profileImage: user.image ?? null,
+              role: 'CLIENTE',
+              city: '',
+              emailVerified: new Date(),
+            },
+          });
+        }
+        return true;
+      }
+      return true;
+    },
+    async jwt({ token, user, account }) {
+      if (account?.provider === 'google') {
+        const dbUser = await prisma.user.findUnique({ where: { email: token.email! } });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.role = dbUser.role;
+        }
+      } else if (user) {
+        token.id = user.id;
+        token.role = (user as { role?: string }).role;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      if (session.user) {
+        (session.user as { id: string }).id = token.id as string;
+        (session.user as { role: string }).role = token.role as string;
+      }
+      return session;
+    },
+  },
 });
