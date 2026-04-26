@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { SERVICE_CATEGORIES } from '@/types';
-import { Shield, Star, MessageSquare, Users } from 'lucide-react';
+import { Shield, Star, MessageSquare } from 'lucide-react';
 
 const CATEGORY_COLORS = [
   { bg: '#FFF0EB', border: '#FFCAB5' },
@@ -18,7 +18,7 @@ const CATEGORY_COLORS = [
 
 const WHY_ITEMS = [
   {
-    icon: <Shield className="h-10 w-10" style={{ color: '#FF6B35' }} />,
+    icon: <Shield className="h-10 w-10" style={{ color: '#F97316' }} />,
     title: 'Taskers Verificados',
     desc: 'Todos nuestros taskers pasan verificación de identidad y antecedentes.',
   },
@@ -28,14 +28,9 @@ const WHY_ITEMS = [
     desc: 'Habla directo con tu tasker sin intermediarios — sin costos, sin comisiones.',
   },
   {
-    icon: <Star className="h-10 w-10" style={{ color: '#FF6B35' }} />,
+    icon: <Star className="h-10 w-10" style={{ color: '#F97316' }} />,
     title: 'Calificaciones Reales',
     desc: 'Lee reseñas de clientes reales antes de contratar. Transparencia total.',
-  },
-  {
-    icon: <Users className="h-10 w-10" style={{ color: '#2EC4B6' }} />,
-    title: 'Hecho para México',
-    desc: 'Diseñado para la realidad mexicana — colonias, estados y costumbres locales.',
   },
 ];
 
@@ -45,43 +40,38 @@ export default function HomePage() {
       {/* Hero */}
       <section
         className="relative overflow-hidden px-4 py-24 sm:px-6 sm:py-36"
-        style={{ background: 'linear-gradient(135deg, #FF6B35 0%, #1A1A2E 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #F97316 0%, #1A1A2E 100%)' }}
       >
         <div className="mx-auto max-w-7xl text-center">
           <h1
             className="text-balance text-4xl font-bold tracking-tight text-white sm:text-6xl"
             style={{ fontFamily: 'Sora, sans-serif' }}
           >
-            agent is connected
+            Alguien cerca de ti listo para ayudarte
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg" style={{ color: 'rgba(255,255,255,0.8)' }}>
-            Conecta gratis con profesionales verificados de limpieza, plomería, electricidad y más
-            — en tu ciudad, en tu colonia, sin comisiones.
+          <p className="mx-auto mt-6 max-w-2xl text-lg" style={{ color: 'rgba(255,255,255,0.85)' }}>
+            Desde arreglos en casa hasta cosas del día a día — conecta en minutos con personas confiables cerca de ti
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Link href="/buscar">
+            <Link href="/buscar-servicios">
               <Button
                 size="lg"
                 className="rounded-xl font-semibold"
-                style={{ backgroundColor: '#FFFFFF', color: '#FF6B35' }}
+                style={{ backgroundColor: '#FFFFFF', color: '#F97316' }}
               >
                 Buscar Servicios
               </Button>
             </Link>
-            <Link href="/registro">
+            <Link href="/favorcito-ya">
               <Button
                 size="lg"
-                variant="outline"
-                className="rounded-xl border-white font-semibold"
-                style={{ color: '#FFFFFF', borderColor: 'rgba(255,255,255,0.7)' }}
+                className="rounded-xl font-bold"
+                style={{ backgroundColor: '#F97316', color: '#FFFFFF', border: '2px solid rgba(255,255,255,0.4)' }}
               >
-                Ofrecer Servicios
+                Favorcitos YA
               </Button>
             </Link>
           </div>
-          <p className="mt-6 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            100% gratis · Sin comisiones · Sin tarjeta de crédito
-          </p>
         </div>
       </section>
 
@@ -100,25 +90,33 @@ export default function HomePage() {
           {SERVICE_CATEGORIES.slice(0, 10).map((cat, i) => {
             const { bg, border } = CATEGORY_COLORS[i % CATEGORY_COLORS.length];
             return (
-              <Link
+              <div
                 key={cat.value}
-                href={`/buscar?categoria=${cat.value}`}
                 className="group flex flex-col items-center rounded-2xl border p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
                 style={{ backgroundColor: bg, borderColor: border }}
               >
-                <span
-                  className="flex h-12 w-12 items-center justify-center rounded-full text-2xl"
-                  style={{ backgroundColor: '#FFE66D' }}
+                <Link href={`/buscar-servicios?categoria=${cat.value}`} className="flex flex-col items-center">
+                  <span
+                    className="flex h-12 w-12 items-center justify-center rounded-full text-2xl"
+                    style={{ backgroundColor: '#FFE66D' }}
+                  >
+                    {cat.icon}
+                  </span>
+                  <span
+                    className="mt-3 text-center text-sm font-semibold"
+                    style={{ color: '#1A1A2E' }}
+                  >
+                    {cat.label}
+                  </span>
+                </Link>
+                <Link
+                  href={`/favorcito-ya?categoria=${cat.value}`}
+                  className="mt-3 w-full rounded-xl px-2 py-1.5 text-center text-xs font-semibold transition-colors"
+                  style={{ backgroundColor: '#F97316', color: '#FFFFFF' }}
                 >
-                  {cat.icon}
-                </span>
-                <span
-                  className="mt-3 text-center text-sm font-semibold"
-                  style={{ color: '#1A1A2E' }}
-                >
-                  {cat.label}
-                </span>
-              </Link>
+                  necesito un favorcito ya!
+                </Link>
+              </div>
             );
           })}
         </div>
@@ -134,9 +132,9 @@ export default function HomePage() {
             ¿Por qué Favorcitos?
           </h2>
           <p className="mt-2 text-center text-sm" style={{ color: '#6B7280' }}>
-            La plataforma más directa para servicios del hogar en México
+            Lo que necesites, cuando lo necesites
           </p>
-          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-6 sm:grid-cols-3">
             {WHY_ITEMS.map((item) => (
               <div
                 key={item.title}
@@ -180,7 +178,7 @@ export default function HomePage() {
               <div key={s.step} className="flex flex-col items-center">
                 <div
                   className="flex h-14 w-14 items-center justify-center rounded-full text-2xl font-bold text-white"
-                  style={{ backgroundColor: '#FF6B35' }}
+                  style={{ backgroundColor: '#F97316' }}
                 >
                   {s.emoji}
                 </div>
@@ -199,7 +197,7 @@ export default function HomePage() {
       {/* CTA */}
       <section
         className="px-4 py-20 text-center sm:px-6"
-        style={{ background: 'linear-gradient(135deg, #FF6B35 0%, #1A1A2E 100%)' }}
+        style={{ background: 'linear-gradient(135deg, #F97316 0%, #1A1A2E 100%)' }}
       >
         <h2
           className="text-2xl font-bold text-white sm:text-3xl"
@@ -211,16 +209,16 @@ export default function HomePage() {
           Regístrate gratis y encuentra el profesional que necesitas en minutos.
         </p>
         <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-          <Link href="/registro">
+          <Link href="/auth">
             <Button
               size="lg"
               className="rounded-xl px-8 font-semibold"
-              style={{ backgroundColor: '#FFFFFF', color: '#FF6B35' }}
+              style={{ backgroundColor: '#FFFFFF', color: '#F97316' }}
             >
               Crear cuenta gratis
             </Button>
           </Link>
-          <Link href="/buscar">
+          <Link href="/buscar-servicios">
             <Button
               size="lg"
               variant="outline"

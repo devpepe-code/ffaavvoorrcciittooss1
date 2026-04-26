@@ -2,7 +2,7 @@ import type { NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 
 export const authConfig = {
-  trustHost: true, // Necesario para Vercel y múltiples dominios
+  trustHost: true,
   providers: [
     Credentials({
       credentials: {},
@@ -10,7 +10,7 @@ export const authConfig = {
     }),
   ],
   pages: {
-    signIn: '/login',
+    signIn: '/auth',
   },
   session: { strategy: 'jwt' as const, maxAge: 30 * 24 * 60 * 60 },
   callbacks: {
@@ -18,18 +18,30 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
       const path = nextUrl.pathname;
 
-      const publicPaths = ['/', '/login', '/registro', '/buscar'];
+      const publicPaths = [
+        '/',
+        '/auth',
+        '/login',
+        '/registro',
+        '/buscar',
+        '/buscar-servicios',
+        '/favorcito-ya',
+        '/about',
+        '/emergencias',
+      ];
       const isTaskerProfile = /^\/tasker\/[^/]+$/.test(path);
+      const isClienteProfile = /^\/cliente\/[^/]+$/.test(path);
       const isPublic =
         publicPaths.some((p) => path === p || path.startsWith(p + '/')) ||
-        isTaskerProfile;
+        isTaskerProfile ||
+        isClienteProfile;
 
-      if (isPublic && path !== '/login' && path !== '/registro') return true;
-      if (path === '/login' || path === '/registro') {
+      if (isPublic && path !== '/login' && path !== '/registro' && path !== '/auth') return true;
+      if (path === '/login' || path === '/registro' || path === '/auth') {
         if (isLoggedIn) return Response.redirect(new URL('/dashboard', nextUrl));
         return true;
       }
-      if (!isLoggedIn) return Response.redirect(new URL('/login', nextUrl));
+      if (!isLoggedIn) return Response.redirect(new URL('/auth', nextUrl));
       return true;
     },
     jwt({ token, user }) {
