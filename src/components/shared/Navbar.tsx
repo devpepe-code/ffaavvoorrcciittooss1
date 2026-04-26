@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut, LayoutDashboard } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
 import { Logo } from './Logo';
 
 function TikTokIcon() {
@@ -25,6 +26,8 @@ function InstagramIcon() {
 
 export function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { data: session } = useSession();
+  const isLoggedIn = !!session?.user;
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -97,14 +100,36 @@ export function Navbar() {
         </div>
 
         <nav className="flex flex-1 flex-col gap-1 p-5">
-          <Link
-            href="/auth"
-            onClick={() => setDrawerOpen(false)}
-            className="flex items-center rounded-xl px-4 py-3 text-sm font-bold transition-colors"
-            style={{ backgroundColor: '#F97316', color: '#FFFFFF' }}
-          >
-            Iniciar Sesión
-          </Link>
+          {isLoggedIn ? (
+            <>
+              <Link
+                href="/dashboard"
+                onClick={() => setDrawerOpen(false)}
+                className="flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-colors"
+                style={{ backgroundColor: '#F97316', color: '#FFFFFF' }}
+              >
+                <LayoutDashboard className="h-4 w-4" />
+                Mi Cuenta
+              </Link>
+              <button
+                onClick={() => { setDrawerOpen(false); signOut({ callbackUrl: '/' }); }}
+                className="flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium transition-colors hover:bg-red-50 text-left"
+                style={{ color: '#EF4444' }}
+              >
+                <LogOut className="h-4 w-4" />
+                Salir
+              </button>
+            </>
+          ) : (
+            <Link
+              href="/auth"
+              onClick={() => setDrawerOpen(false)}
+              className="flex items-center rounded-xl px-4 py-3 text-sm font-bold transition-colors"
+              style={{ backgroundColor: '#F97316', color: '#FFFFFF' }}
+            >
+              Iniciar Sesión
+            </Link>
+          )}
           <Link
             href="/favorcito-ya"
             onClick={() => setDrawerOpen(false)}
