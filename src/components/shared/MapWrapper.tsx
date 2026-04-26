@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Loader } from '@googlemaps/js-api-loader';
+import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 
 const MOCK_MODE =
   !process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY ||
@@ -18,20 +18,19 @@ export function MapWrapper({
 }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const markerRefsRef = useRef<google.maps.marker.AdvancedMarkerElement[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const markerRefsRef = useRef<any[]>([]);
 
   useEffect(() => {
     if (MOCK_MODE || !mapRef.current || !center) return;
 
-    const loader = new Loader({
-      apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY!,
-      version: 'weekly',
-    });
+    setOptions({ key: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY!, v: 'weekly' });
 
     (async () => {
       try {
-        const { Map } = await loader.importLibrary('maps') as google.maps.MapsLibrary;
-        const { AdvancedMarkerElement } = await loader.importLibrary('marker') as google.maps.MarkerLibrary;
+        const { Map } = await importLibrary('maps');
+        const { LatLngBounds } = await importLibrary('core');
+        const { AdvancedMarkerElement } = await importLibrary('marker');
 
         if (!mapRef.current) return;
 
@@ -84,7 +83,7 @@ export function MapWrapper({
         });
 
         if (markers.length > 0) {
-          const bounds = new google.maps.LatLngBounds();
+          const bounds = new LatLngBounds();
           bounds.extend(center);
           markers.forEach((m) => bounds.extend({ lat: m.lat, lng: m.lng }));
           mapInstanceRef.current.fitBounds(bounds, 80);
