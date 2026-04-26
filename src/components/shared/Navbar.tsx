@@ -100,18 +100,18 @@ export function Navbar() {
           <Link
             href="/auth"
             onClick={() => setDrawerOpen(false)}
-            className="flex items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors hover:bg-orange-50"
-            style={{ color: '#1A1A2E' }}
+            className="flex items-center rounded-xl px-4 py-3 text-sm font-bold transition-colors"
+            style={{ backgroundColor: '#F97316', color: '#FFFFFF' }}
           >
             Iniciar Sesión
           </Link>
           <Link
             href="/favorcito-ya"
             onClick={() => setDrawerOpen(false)}
-            className="flex items-center rounded-xl px-4 py-3 text-sm font-bold transition-colors"
-            style={{ backgroundColor: '#F97316', color: '#FFFFFF' }}
+            className="flex items-center rounded-xl px-4 py-3 text-sm font-medium transition-colors hover:bg-orange-50"
+            style={{ color: '#1A1A2E' }}
           >
-            Favorcito YA!
+            ⚡ Favorcito YA!
           </Link>
           <Link
             href="/buscar-servicios"
