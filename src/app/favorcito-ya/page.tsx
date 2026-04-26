@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { MapPin, Navigation, Send, Zap } from 'lucide-react';
+import { MapPin, Navigation, Search, Send, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MapWrapper } from '@/components/shared/MapWrapper';
 import { ChatWindow } from '@/components/shared/ChatWindow';
@@ -26,6 +26,14 @@ const MOCK_TASKERS: TaskerMarker[] = [
   { id: '3', firstName: 'Roberto', lastName: 'Sánchez', lat: 0, lng: 0, distance: 3.5, rating: 4.7 },
 ];
 
+function spawnTaskers(lat: number, lng: number) {
+  return MOCK_TASKERS.map((t, i) => ({
+    ...t,
+    lat: lat + (i % 2 === 0 ? 0.005 : -0.003) * (i + 1),
+    lng: lng + (i % 2 === 0 ? 0.004 : -0.005) * (i + 1),
+  }));
+}
+
 export default function FavorcitYaPage() {
   const geo = useGeolocation();
   const [description, setDescription] = useState('');
@@ -36,22 +44,23 @@ export default function FavorcitYaPage() {
   const [taskers, setTaskers] = useState<TaskerMarker[]>([]);
   const [dotsCount, setDotsCount] = useState(1);
 
-  useEffect(() => {
-    geo.request();
-  }, []);
+  // Manual location
+  const [locationMode, setLocationMode] = useState<'auto' | 'manual'>('auto');
+  const [locationQuery, setLocationQuery] = useState('');
+  const [manualCenter, setManualCenter] = useState<{ lat: number; lng: number } | null>(null);
+  const [searchingLocation, setSearchingLocation] = useState(false);
+  const [locationError, setLocationError] = useState('');
 
-  // Populate mock taskers with coordinates once geo is available
+  useEffect(() => { geo.request(); }, []);
+
+  // Auto-detect: populate taskers when GPS resolves
   useEffect(() => {
-    if (geo.status === 'success') {
+    if (geo.status === 'success' && locationMode === 'auto') {
       const lat = (geo as any).lat as number;
       const lng = (geo as any).lng as number;
-      setTaskers(MOCK_TASKERS.map((t, i) => ({
-        ...t,
-        lat: lat + (i % 2 === 0 ? 0.005 : -0.003) * (i + 1),
-        lng: lng + (i % 2 === 0 ? 0.004 : -0.005) * (i + 1),
-      })));
+      setTaskers(spawnTaskers(lat, lng));
     }
-  }, [geo.status]);
+  }, [geo.status, locationMode]);
 
   // Animated dots while waiting
   useEffect(() => {
@@ -60,31 +69,51 @@ export default function FavorcitYaPage() {
     return () => clearInterval(interval);
   }, [alertStatus]);
 
+  async function handleLocationSearch() {
+    if (!locationQuery.trim()) return;
+    setSearchingLocation(true);
+    setLocationError('');
+    try {
+      const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
+      const res = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(locationQuery)}&region=mx&key=${key}`
+      );
+      const data = await res.json();
+      if (data.status === 'OK' && data.results[0]) {
+        const { lat, lng } = data.results[0].geometry.location;
+        setManualCenter({ lat, lng });
+        setTaskers(spawnTaskers(lat, lng));
+      } else {
+        setLocationError('No se encontró esa ubicación. Intenta con una ciudad o dirección.');
+      }
+    } catch {
+      setLocationError('Error al buscar. Verifica tu conexión.');
+    } finally {
+      setSearchingLocation(false);
+    }
+  }
+
   function handleSendAlert() {
     if (!description.trim()) return;
     setAlertStatus('sending');
-
-    // Simulate sending alert
     setTimeout(() => {
       setAlertStatus('waiting');
-      // TODO: Replace with real broadcast to nearby taskers via WebSocket/Supabase
-
-      // Simulate first tasker accepting after ~3 seconds
       setTimeout(() => {
         const responder = MOCK_TASKERS[Math.floor(Math.random() * MOCK_TASKERS.length)];
         setAcceptingTasker(responder);
         setAlertStatus('accepted');
         setShowChat(true);
-        // TODO: Replace with real-time listener for tasker acceptance event
       }, 3000);
     }, 800);
   }
 
+  const geoCenter = geo.status === 'success'
+    ? { lat: (geo as any).lat as number, lng: (geo as any).lng as number }
+    : null;
+  const center = locationMode === 'manual' ? manualCenter ?? undefined : geoCenter ?? undefined;
+
   const markers = taskers.map((t) => ({
-    id: t.id,
-    lat: t.lat,
-    lng: t.lng,
-    label: `${t.firstName} ${t.lastName}`,
+    id: t.id, lat: t.lat, lng: t.lng, label: `${t.firstName} ${t.lastName}`,
   }));
 
   return (
@@ -122,67 +151,101 @@ export default function FavorcitYaPage() {
               style={{ color: '#1A1A2E' }}
             />
             <div className="mt-1 flex justify-between">
-              <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                Sé específico para recibir mejores respuestas
-              </span>
-              <span className="text-xs" style={{ color: '#9CA3AF' }}>
-                {description.length}/200
-              </span>
+              <span className="text-xs" style={{ color: '#9CA3AF' }}>Sé específico para recibir mejores respuestas</span>
+              <span className="text-xs" style={{ color: '#9CA3AF' }}>{description.length}/200</span>
             </div>
 
-            {/* Location row */}
-            <div className="mt-4 flex items-center justify-between gap-3">
-              <button
-                onClick={() => geo.request()}
-                disabled={geo.status === 'loading'}
-                className="flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium transition-colors"
-                style={{
-                  borderColor: geo.status === 'success' ? '#2EC4B6' : '#E5E7EB',
-                  color: geo.status === 'success' ? '#2EC4B6' : '#6B7280',
-                  backgroundColor: geo.status === 'success' ? '#E8FAF9' : '#FFFFFF',
-                }}
-              >
-                {geo.status === 'success' ? (
-                  <><Navigation className="h-3.5 w-3.5" /> Ubicación detectada</>
-                ) : (
-                  <><MapPin className="h-3.5 w-3.5" /> {geo.status === 'loading' ? 'Detectando...' : 'Detectar ubicación'}</>
-                )}
-              </button>
-
-              <div className="flex items-center gap-2 text-xs" style={{ color: '#6B7280' }}>
-                <span>Radio:</span>
-                <input
-                  type="range"
-                  min="1"
-                  max="20"
-                  value={radius}
-                  onChange={(e) => setRadius(Number(e.target.value))}
-                  className="w-20"
-                />
-                <span className="w-8 font-medium" style={{ color: '#1A1A2E' }}>{radius} km</span>
+            {/* Location section */}
+            <div className="mt-4 space-y-3">
+              {/* Mode toggle */}
+              <div className="flex rounded-xl p-1 gap-1" style={{ backgroundColor: '#F7F3EE' }}>
+                <button
+                  onClick={() => setLocationMode('auto')}
+                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-semibold transition-all"
+                  style={{
+                    backgroundColor: locationMode === 'auto' ? '#FFFFFF' : 'transparent',
+                    color: locationMode === 'auto' ? '#1A1A2E' : '#6B7280',
+                    boxShadow: locationMode === 'auto' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                  }}
+                >
+                  <Navigation className="h-3 w-3" /> Automática
+                </button>
+                <button
+                  onClick={() => setLocationMode('manual')}
+                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-semibold transition-all"
+                  style={{
+                    backgroundColor: locationMode === 'manual' ? '#FFFFFF' : 'transparent',
+                    color: locationMode === 'manual' ? '#1A1A2E' : '#6B7280',
+                    boxShadow: locationMode === 'manual' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                  }}
+                >
+                  <MapPin className="h-3 w-3" /> Buscar ubicación
+                </button>
               </div>
+
+              {locationMode === 'auto' ? (
+                <div className="flex items-center justify-between gap-3">
+                  <button
+                    onClick={() => geo.request()}
+                    disabled={geo.status === 'loading'}
+                    className="flex items-center gap-2 rounded-xl border px-3 py-2 text-xs font-medium transition-colors"
+                    style={{
+                      borderColor: geo.status === 'success' ? '#2EC4B6' : '#E5E7EB',
+                      color: geo.status === 'success' ? '#2EC4B6' : '#6B7280',
+                      backgroundColor: geo.status === 'success' ? '#E8FAF9' : '#FFFFFF',
+                    }}
+                  >
+                    {geo.status === 'success'
+                      ? <><Navigation className="h-3.5 w-3.5" /> Ubicación detectada</>
+                      : <><MapPin className="h-3.5 w-3.5" /> {geo.status === 'loading' ? 'Detectando...' : 'Detectar ubicación'}</>}
+                  </button>
+                  <div className="flex items-center gap-2 text-xs" style={{ color: '#6B7280' }}>
+                    <span>Radio:</span>
+                    <input type="range" min="1" max="20" value={radius} onChange={(e) => setRadius(Number(e.target.value))} className="w-20" />
+                    <span className="w-8 font-medium" style={{ color: '#1A1A2E' }}>{radius} km</span>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={locationQuery}
+                      onChange={(e) => setLocationQuery(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') handleLocationSearch(); }}
+                      placeholder="Ciudad, colonia o dirección..."
+                      className="flex-1 rounded-xl border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
+                    />
+                    <button
+                      onClick={handleLocationSearch}
+                      disabled={searchingLocation || !locationQuery.trim()}
+                      className="flex items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                      style={{ backgroundColor: '#F97316' }}
+                    >
+                      <Search className="h-4 w-4" />
+                      {searchingLocation ? 'Buscando...' : 'Buscar'}
+                    </button>
+                  </div>
+                  {locationError && <p className="text-xs" style={{ color: '#EF4444' }}>{locationError}</p>}
+                  {manualCenter && !locationError && (
+                    <p className="text-xs" style={{ color: '#2EC4B6' }}>✓ Ubicación encontrada</p>
+                  )}
+                </div>
+              )}
             </div>
 
             <Button
               onClick={handleSendAlert}
-              disabled={!description.trim() || alertStatus === 'sending'}
+              disabled={!description.trim() || alertStatus === 'sending' || !center}
               className="mt-5 w-full rounded-xl py-3 text-base font-bold"
               style={{ backgroundColor: '#F97316', color: '#FFFFFF' }}
             >
-              {alertStatus === 'sending' ? (
-                'Enviando...'
-              ) : (
-                <><Send className="mr-2 h-4 w-4" /> Enviar alerta a taskers cercanos</>
-              )}
+              {alertStatus === 'sending' ? 'Enviando...' : <><Send className="mr-2 h-4 w-4" /> Enviar alerta a taskers cercanos</>}
             </Button>
           </>
         ) : alertStatus === 'waiting' ? (
-          /* Waiting state */
           <div className="py-6 text-center">
-            <div
-              className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full"
-              style={{ backgroundColor: '#FFF7ED' }}
-            >
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full" style={{ backgroundColor: '#FFF7ED' }}>
               <div className="text-3xl">📡</div>
             </div>
             <h2 className="text-lg font-bold" style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}>
@@ -191,22 +254,14 @@ export default function FavorcitYaPage() {
             <p className="mt-2 text-sm" style={{ color: '#6B7280' }}>
               Tu solicitud fue enviada. En cuanto alguien acepte, el chat se abrirá automáticamente.
             </p>
-            <div
-              className="mt-4 rounded-xl p-3 text-sm"
-              style={{ backgroundColor: '#F7F3EE', color: '#6B7280' }}
-            >
+            <div className="mt-4 rounded-xl p-3 text-sm" style={{ backgroundColor: '#F7F3EE', color: '#6B7280' }}>
               "{description}"
             </div>
-            <button
-              onClick={() => setAlertStatus('idle')}
-              className="mt-4 text-xs underline"
-              style={{ color: '#9CA3AF' }}
-            >
+            <button onClick={() => setAlertStatus('idle')} className="mt-4 text-xs underline" style={{ color: '#9CA3AF' }}>
               Cancelar alerta
             </button>
           </div>
         ) : (
-          /* Accepted state */
           <div className="py-4 text-center">
             <div className="mb-3 text-4xl">🎉</div>
             <h2 className="text-lg font-bold" style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}>
@@ -220,13 +275,13 @@ export default function FavorcitYaPage() {
       </div>
 
       {/* Map */}
-      {geo.status === 'success' && taskers.length > 0 && (
+      {center && taskers.length > 0 && (
         <div className="mt-6">
           <p className="mb-2 text-xs font-medium" style={{ color: '#9CA3AF' }}>
             {taskers.length} taskers disponibles en tu zona
           </p>
           <MapWrapper
-            center={{ lat: (geo as any).lat, lng: (geo as any).lng }}
+            center={center}
             markers={markers}
             onMarkerClick={(id) => {
               const t = taskers.find((x) => x.id === id);
@@ -236,13 +291,12 @@ export default function FavorcitYaPage() {
         </div>
       )}
 
-      {geo.status === 'error' && (
+      {geo.status === 'error' && locationMode === 'auto' && (
         <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm" style={{ color: '#DC2626' }}>
-          {(geo as any).message || 'No se pudo detectar tu ubicación.'} Activa el GPS e intenta de nuevo.
+          {(geo as any).message || 'No se pudo detectar tu ubicación.'} Activa el GPS o usa la búsqueda manual.
         </div>
       )}
 
-      {/* No taskers fallback */}
       <div className="mt-6 rounded-xl p-4 text-center" style={{ backgroundColor: '#F7F3EE' }}>
         <p className="text-sm" style={{ color: '#6B7280' }}>
           ¿No hay nadie disponible?{' '}
