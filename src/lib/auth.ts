@@ -60,7 +60,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true;
     },
     async jwt({ token, user, account, trigger }) {
-      if (account?.provider === 'google') {
+      if (account?.provider === 'google' || (token.email && !token.id)) {
         const dbUser = await prisma.user.findUnique({ where: { email: token.email! } });
         if (dbUser) {
           token.id = dbUser.id;
