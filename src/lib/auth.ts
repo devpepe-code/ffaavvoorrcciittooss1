@@ -49,7 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               firstName: parts[0],
               lastName: parts.slice(1).join(' ') || '',
               profileImage: user.image ?? null,
-              role: 'CLIENTE',
+              role: 'ONBOARDING',
               city: '',
               emailVerified: new Date(),
             },

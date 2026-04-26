@@ -28,6 +28,7 @@ export const authConfig = {
         '/favorcito-ya',
         '/about',
         '/emergencias',
+        '/onboarding',
       ];
       const isTaskerProfile = /^\/tasker\/[^/]+$/.test(path);
       const isClienteProfile = /^\/cliente\/[^/]+$/.test(path);

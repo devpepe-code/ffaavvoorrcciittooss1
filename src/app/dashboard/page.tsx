@@ -6,6 +6,7 @@ export default async function DashboardGatePage() {
   if (!session?.user?.id) redirect('/login');
 
   const role = (session.user as { role?: string }).role;
+  if (role === 'ONBOARDING') redirect('/onboarding');
   if (role === 'ADMIN') redirect('/admin/dashboard');
   if (role === 'TASKER') redirect('/tasker/dashboard');
   redirect('/cliente/dashboard');
