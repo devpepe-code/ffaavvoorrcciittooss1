@@ -35,13 +35,15 @@ export default function FavorcitYaPage() {
   // Mock tasker data
   useEffect(() => {
     if (geo.status === 'success') {
+      const userLat = (geo as any).lat || 19.43;
+      const userLng = (geo as any).lng || -99.13;
       const mockTaskers: TaskerMarker[] = [
         {
           id: '1',
           firstName: 'Carlos',
           lastName: 'Rodríguez',
-          lat: geo.lat + 0.005,
-          lng: geo.lng + 0.005,
+          lat: userLat + 0.005,
+          lng: userLng + 0.005,
           distance: 1.2,
           rating: 4.8,
           category: 'PLOMERIA',
@@ -50,8 +52,8 @@ export default function FavorcitYaPage() {
           id: '2',
           firstName: 'Ana',
           lastName: 'Martínez',
-          lat: geo.lat - 0.003,
-          lng: geo.lng - 0.004,
+          lat: userLat - 0.003,
+          lng: userLng - 0.004,
           distance: 2.1,
           rating: 4.9,
           category: 'LIMPIEZA_HOGAR',
@@ -60,8 +62,8 @@ export default function FavorcitYaPage() {
           id: '3',
           firstName: 'Roberto',
           lastName: 'Sánchez',
-          lat: geo.lat + 0.004,
-          lng: geo.lng - 0.006,
+          lat: userLat + 0.004,
+          lng: userLng - 0.006,
           distance: 3.5,
           rating: 4.7,
           category: 'PINTURA',
@@ -72,7 +74,7 @@ export default function FavorcitYaPage() {
         : mockTaskers;
       setTaskers(filtered);
     }
-  }, [geo.status, geo.lat, geo.lng, selectedCategory]);
+  }, [geo.status, selectedCategory]);
 
   const markers = taskers.map((t) => ({
     id: t.id,
@@ -153,7 +155,7 @@ export default function FavorcitYaPage() {
       {geo.status === 'success' ? (
         <div className="mt-8">
           <MapWrapper
-            center={{ lat: geo.lat, lng: geo.lng }}
+            center={{ lat: (geo as any).lat || 19.43, lng: (geo as any).lng || -99.13 }}
             markers={markers}
             onMarkerClick={(id) => {
               const t = taskers.find((x) => x.id === id);
