@@ -26,74 +26,73 @@ export function MapWrapper({
     const loader = new Loader({
       apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY!,
       version: 'weekly',
-      libraries: ['maps', 'marker'],
     });
 
-    loader.load().then(async () => {
-      const { Map } = await google.maps.importLibrary('maps') as google.maps.MapsLibrary;
-      const { AdvancedMarkerElement } = await google.maps.importLibrary('marker') as google.maps.MarkerLibrary;
+    (async () => {
+      try {
+        const { Map } = await loader.importLibrary('maps') as google.maps.MapsLibrary;
+        const { AdvancedMarkerElement } = await loader.importLibrary('marker') as google.maps.MarkerLibrary;
 
-      if (!mapRef.current) return;
+        if (!mapRef.current) return;
 
-      mapInstanceRef.current = new Map(mapRef.current, {
-        center,
-        zoom: 14,
-        mapId: 'favorcitos-map',
-        disableDefaultUI: false,
-        zoomControl: true,
-        streetViewControl: false,
-        mapTypeControl: false,
-      });
-
-      // Clear old markers
-      markerRefsRef.current.forEach((m) => (m.map = null));
-      markerRefsRef.current = [];
-
-      // User location pin (blue)
-      const userPin = document.createElement('div');
-      userPin.style.cssText = `
-        width: 16px; height: 16px;
-        background: #3B82F6; border: 3px solid white;
-        border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(59,130,246,0.5);
-      `;
-      markerRefsRef.current.push(
-        new AdvancedMarkerElement({ position: center, map: mapInstanceRef.current, title: 'Tu ubicación', content: userPin })
-      );
-
-      // Tasker pins (orange)
-      markers.forEach((marker) => {
-        const pin = document.createElement('div');
-        pin.style.cssText = `
-          width: 36px; height: 36px;
-          background: #F97316; border: 3px solid white;
-          border-radius: 50%; display: flex; align-items: center;
-          justify-content: center; cursor: pointer; font-size: 16px;
-          box-shadow: 0 2px 8px rgba(249,115,22,0.4);
-          transition: transform 0.15s;
-        `;
-        pin.textContent = '🔧';
-        pin.addEventListener('mouseenter', () => (pin.style.transform = 'scale(1.2)'));
-        pin.addEventListener('mouseleave', () => (pin.style.transform = 'scale(1)'));
-
-        const el = new AdvancedMarkerElement({
-          position: { lat: marker.lat, lng: marker.lng },
-          map: mapInstanceRef.current!,
-          title: marker.label,
-          content: pin,
+        mapInstanceRef.current = new Map(mapRef.current, {
+          center,
+          zoom: 14,
+          mapId: 'favorcitos-map',
+          disableDefaultUI: false,
+          zoomControl: true,
+          streetViewControl: false,
+          mapTypeControl: false,
         });
-        el.addListener('click', () => onMarkerClick?.(marker.id));
-        markerRefsRef.current.push(el);
-      });
 
-      // Fit bounds if markers exist
-      if (markers.length > 0) {
-        const bounds = new google.maps.LatLngBounds();
-        bounds.extend(center);
-        markers.forEach((m) => bounds.extend({ lat: m.lat, lng: m.lng }));
-        mapInstanceRef.current.fitBounds(bounds, 80);
+        markerRefsRef.current.forEach((m) => (m.map = null));
+        markerRefsRef.current = [];
+
+        const userPin = document.createElement('div');
+        userPin.style.cssText = `
+          width: 16px; height: 16px;
+          background: #3B82F6; border: 3px solid white;
+          border-radius: 50%;
+          box-shadow: 0 2px 8px rgba(59,130,246,0.5);
+        `;
+        markerRefsRef.current.push(
+          new AdvancedMarkerElement({ position: center, map: mapInstanceRef.current, title: 'Tu ubicación', content: userPin })
+        );
+
+        markers.forEach((marker) => {
+          const pin = document.createElement('div');
+          pin.style.cssText = `
+            width: 36px; height: 36px;
+            background: #F97316; border: 3px solid white;
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; font-size: 16px;
+            box-shadow: 0 2px 8px rgba(249,115,22,0.4);
+            transition: transform 0.15s;
+          `;
+          pin.textContent = '🔧';
+          pin.addEventListener('mouseenter', () => (pin.style.transform = 'scale(1.2)'));
+          pin.addEventListener('mouseleave', () => (pin.style.transform = 'scale(1)'));
+
+          const el = new AdvancedMarkerElement({
+            position: { lat: marker.lat, lng: marker.lng },
+            map: mapInstanceRef.current!,
+            title: marker.label,
+            content: pin,
+          });
+          el.addListener('click', () => onMarkerClick?.(marker.id));
+          markerRefsRef.current.push(el);
+        });
+
+        if (markers.length > 0) {
+          const bounds = new google.maps.LatLngBounds();
+          bounds.extend(center);
+          markers.forEach((m) => bounds.extend({ lat: m.lat, lng: m.lng }));
+          mapInstanceRef.current.fitBounds(bounds, 80);
+        }
+      } catch (err) {
+        console.error('Google Maps failed to load:', err);
       }
-    }).catch((err) => console.error('Google Maps failed to load:', err));
+    })();
   }, [center?.lat, center?.lng, markers.length]);
 
   if (MOCK_MODE) {
