@@ -15,17 +15,19 @@ type Message = {
 export function ChatWindow({
   taskerId,
   taskerName,
+  initialMessage,
   onClose,
 }: {
   taskerId: string;
   taskerName: string;
+  initialMessage?: string;
   onClose?: () => void;
 }) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
       sender: 'client',
-      text: 'Hola, necesito ayuda con plomería. ¿Estás disponible?',
+      text: initialMessage || 'Hola, necesito ayuda. ¿Estás disponible?',
       timestamp: new Date(),
     },
   ]);
