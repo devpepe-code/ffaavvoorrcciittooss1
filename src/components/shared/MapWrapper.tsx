@@ -68,7 +68,7 @@ export function MapWrapper({
             box-shadow: 0 2px 8px rgba(249,115,22,0.4);
             transition: transform 0.15s;
           `;
-          pin.textContent = '🔧';
+          pin.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
           pin.addEventListener('mouseenter', () => (pin.style.transform = 'scale(1.2)'));
           pin.addEventListener('mouseleave', () => (pin.style.transform = 'scale(1)'));
 

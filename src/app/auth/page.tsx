@@ -203,7 +203,7 @@ export default function AuthPage() {
                 <div className="grid grid-cols-2 gap-2">
                   {([
                     { value: 'CLIENTE', label: '🏠 Contratar servicios' },
-                    { value: 'TASKER', label: '🔧 Ofrecer servicios' },
+                    { value: 'TASKER', label: '⚡ Ofrecer servicios' },
                   ] as const).map((opt) => (
                     <button
                       key={opt.value}

@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Zap } from 'lucide-react';
 import { SERVICE_CATEGORIES } from '@/types';
 import { ESTADOS_MEXICO, CIUDADES_POR_ESTADO } from '@/lib/mexicoData';
 
@@ -158,7 +158,9 @@ export default function RegisterPage() {
             onMouseEnter={(e) => (e.currentTarget.style.borderColor = '#2EC4B6')}
             onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#E5E7EB')}
           >
-            <span className="text-5xl">🔧</span>
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl" style={{ backgroundColor: '#FFF7ED' }}>
+              <Zap className="h-8 w-8" style={{ color: '#F97316' }} />
+            </div>
             <h3
               className="mt-4 text-xl font-bold"
               style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}
@@ -202,7 +204,7 @@ export default function RegisterPage() {
             className="text-2xl"
             style={{ fontFamily: 'Sora, sans-serif', color: '#1A1A2E' }}
           >
-            {role === 'TASKER' ? '🔧 Cuenta de Tasker' : '🏠 Cuenta de Cliente'}
+            {role === 'TASKER' ? '⚡ Cuenta de Tasker' : '🏠 Cuenta de Cliente'}
           </CardTitle>
           <p style={{ color: '#6B7280' }}>
             {role === 'TASKER'
