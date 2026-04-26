@@ -111,8 +111,7 @@ export function ChatWindow({
             onKeyDown={(e) => {
               if (e.key === 'Enter') handleSend();
             }}
-            className="flex-1 rounded-xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2"
-            style={{ focusRingColor: '#F97316' }}
+            className="flex-1 rounded-xl border border-slate-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
           />
           <Button
             onClick={handleSend}

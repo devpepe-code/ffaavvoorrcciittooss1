@@ -102,8 +102,7 @@ export default function FavorcitYaPage() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="h-10 w-full rounded-xl border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2"
-              style={{ focusRingColor: '#F97316' }}
+              className="h-10 w-full rounded-xl border border-slate-200 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"
             >
               <option value="">Todas</option>
               {SERVICE_CATEGORIES.filter((c) => c.value !== 'OTRO').map((c) => (
