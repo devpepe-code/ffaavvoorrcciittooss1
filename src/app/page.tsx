@@ -90,33 +90,25 @@ export default function HomePage() {
           {SERVICE_CATEGORIES.slice(0, 10).map((cat, i) => {
             const { bg, border } = CATEGORY_COLORS[i % CATEGORY_COLORS.length];
             return (
-              <div
+              <Link
                 key={cat.value}
+                href={`/buscar-servicios?categoria=${cat.value}`}
                 className="group flex flex-col items-center rounded-2xl border p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
                 style={{ backgroundColor: bg, borderColor: border }}
               >
-                <Link href={`/buscar-servicios?categoria=${cat.value}`} className="flex flex-col items-center">
-                  <span
-                    className="flex h-12 w-12 items-center justify-center rounded-full text-2xl"
-                    style={{ backgroundColor: '#FFE66D' }}
-                  >
-                    {cat.icon}
-                  </span>
-                  <span
-                    className="mt-3 text-center text-sm font-semibold"
-                    style={{ color: '#1A1A2E' }}
-                  >
-                    {cat.label}
-                  </span>
-                </Link>
-                <Link
-                  href={`/favorcito-ya?categoria=${cat.value}`}
-                  className="mt-3 w-full rounded-xl px-2 py-1.5 text-center text-xs font-semibold transition-colors"
-                  style={{ backgroundColor: '#F97316', color: '#FFFFFF' }}
+                <span
+                  className="flex h-12 w-12 items-center justify-center rounded-full text-2xl"
+                  style={{ backgroundColor: '#FFE66D' }}
                 >
-                  necesito un favorcito ya!
-                </Link>
-              </div>
+                  {cat.icon}
+                </span>
+                <span
+                  className="mt-3 text-center text-sm font-semibold"
+                  style={{ color: '#1A1A2E' }}
+                >
+                  {cat.label}
+                </span>
+              </Link>
             );
           })}
         </div>

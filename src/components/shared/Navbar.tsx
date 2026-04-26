@@ -60,7 +60,7 @@ export function Navbar() {
               Favorcito YA!
             </Link>
             <button
-              className="flex h-10 w-10 items-center justify-center rounded-xl transition-colors"
+              className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl transition-colors"
               style={{ color: '#1A1A2E' }}
               onClick={() => setDrawerOpen(true)}
               aria-label="Abrir menú"
