@@ -59,7 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger }) {
       if (account?.provider === 'google') {
         const dbUser = await prisma.user.findUnique({ where: { email: token.email! } });
         if (dbUser) {
@@ -69,6 +69,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       } else if (user) {
         token.id = user.id;
         token.role = (user as { role?: string }).role;
+      } else if (trigger === 'update' && token.id) {
+        const dbUser = await prisma.user.findUnique({ where: { id: token.id as string } });
+        if (dbUser) token.role = dbUser.role;
       }
       return token;
     },

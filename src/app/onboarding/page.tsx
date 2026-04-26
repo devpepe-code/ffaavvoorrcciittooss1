@@ -2,23 +2,34 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Logo } from '@/components/shared/Logo';
 import { Zap, Home } from 'lucide-react';
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { update } = useSession();
   const [selected, setSelected] = useState<'CLIENTE' | 'TASKER' | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   async function handleContinue() {
     if (!selected) return;
     setLoading(true);
-    await fetch('/api/user/set-role', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ role: selected }),
-    });
-    router.push(selected === 'TASKER' ? '/tasker/dashboard' : '/cliente/dashboard');
+    setError('');
+    try {
+      const res = await fetch('/api/user/set-role', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: selected }),
+      });
+      if (!res.ok) throw new Error('Error al guardar el rol');
+      await update({ role: selected });
+      router.push(selected === 'TASKER' ? '/tasker/dashboard' : '/cliente/dashboard');
+    } catch {
+      setError('Algo salió mal. Intenta de nuevo.');
+      setLoading(false);
+    }
   }
 
   return (
@@ -36,7 +47,6 @@ export default function OnboardingPage() {
         </p>
 
         <div className="grid grid-cols-2 gap-4">
-          {/* Cliente */}
           <button
             onClick={() => setSelected('CLIENTE')}
             className="flex flex-col items-center rounded-2xl border-2 p-6 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
@@ -48,15 +58,10 @@ export default function OnboardingPage() {
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl" style={{ backgroundColor: selected === 'CLIENTE' ? '#FDBA74' : '#F3F4F6' }}>
               <Home className="h-7 w-7" style={{ color: selected === 'CLIENTE' ? '#FFFFFF' : '#6B7280' }} />
             </div>
-            <h3 className="font-bold" style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}>
-              Contratar
-            </h3>
-            <p className="mt-1 text-xs" style={{ color: '#6B7280' }}>
-              Necesito ayuda con servicios en casa
-            </p>
+            <h3 className="font-bold" style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}>Contratar</h3>
+            <p className="mt-1 text-xs" style={{ color: '#6B7280' }}>Necesito ayuda con servicios en casa</p>
           </button>
 
-          {/* Tasker */}
           <button
             onClick={() => setSelected('TASKER')}
             className="flex flex-col items-center rounded-2xl border-2 p-6 text-center transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
@@ -68,14 +73,14 @@ export default function OnboardingPage() {
             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl" style={{ backgroundColor: selected === 'TASKER' ? '#FDBA74' : '#F3F4F6' }}>
               <Zap className="h-7 w-7" style={{ color: selected === 'TASKER' ? '#FFFFFF' : '#6B7280' }} />
             </div>
-            <h3 className="font-bold" style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}>
-              Ofrecer servicios
-            </h3>
-            <p className="mt-1 text-xs" style={{ color: '#6B7280' }}>
-              Quiero ganar dinero con mis habilidades
-            </p>
+            <h3 className="font-bold" style={{ color: '#1A1A2E', fontFamily: 'Sora, sans-serif' }}>Ofrecer servicios</h3>
+            <p className="mt-1 text-xs" style={{ color: '#6B7280' }}>Quiero ganar dinero con mis habilidades</p>
           </button>
         </div>
+
+        {error && (
+          <p className="mt-4 text-center text-sm" style={{ color: '#EF4444' }}>{error}</p>
+        )}
 
         <button
           onClick={handleContinue}
