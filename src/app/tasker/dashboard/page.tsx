@@ -23,7 +23,7 @@ export default async function TaskerDashboardPage() {
     take: 10,
   });
   const reviews = await prisma.review.findMany({
-    where: { taskerId: userId },
+    where: { reviewedId: userId },
     orderBy: { createdAt: 'desc' },
     take: 5,
   });
