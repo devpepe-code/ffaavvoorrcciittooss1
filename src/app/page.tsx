@@ -50,7 +50,7 @@ export default function HomePage() {
             Alguien cerca de ti listo para ayudarte
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg" style={{ color: 'rgba(255,255,255,0.85)' }}>
-            Desde arreglos en casa hasta cosas del día a día — conecta en minutos con personas confiables cerca de ti
+            Desde arreglos en casa hasta favorcitos inmediatos — conecta en minutos con personas confiables cerca de ti
           </p>
           <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:justify-center">
             <Link href="/buscar-servicios">
@@ -68,7 +68,7 @@ export default function HomePage() {
                 className="rounded-xl font-bold"
                 style={{ backgroundColor: '#F97316', color: '#FFFFFF', border: '2px solid rgba(255,255,255,0.4)' }}
               >
-                Favorcitos YA
+                Favorcito YA!
               </Button>
             </Link>
           </div>
