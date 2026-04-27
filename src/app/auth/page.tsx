@@ -1,6 +1,7 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
+import Link from 'next/link';
 import { Logo } from '@/components/shared/Logo';
 
 export default function AuthPage() {
@@ -40,7 +41,7 @@ export default function AuthPage() {
 
           <p className="mt-6 text-xs" style={{ color: '#9CA3AF' }}>
             Al continuar aceptas nuestros{' '}
-            <a href="#" style={{ color: '#F97316' }}>términos de uso</a>.
+            <Link href="/terminos" style={{ color: '#F97316' }}>términos de uso</Link>.
           </p>
         </div>
       </div>

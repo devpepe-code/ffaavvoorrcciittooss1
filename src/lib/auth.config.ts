@@ -29,6 +29,7 @@ export const authConfig = {
         '/about',
         '/emergencias',
         '/onboarding',
+        '/terminos',
       ];
       const isTaskerProfile = /^\/tasker\/[^/]+$/.test(path);
       const isClienteProfile = /^\/cliente\/[^/]+$/.test(path);
