@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { SERVICE_CATEGORIES } from '@/types';
 import { ESTADOS_MEXICO, CIUDADES_POR_ESTADO } from '@/lib/mexicoData';
-import { Search, Star, MapPin, AlertCircle, Map, List } from 'lucide-react';
+import { Search, Star, MapPin, AlertCircle } from 'lucide-react';
 import { SearchMap } from './SearchMap';
 import { useGeolocation } from '@/hooks/useGeolocation';
 
@@ -43,8 +43,8 @@ export function TaskerSearch() {
   const [taskers, setTaskers] = useState<Tasker[]>([]);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [hasSearched, setHasSearched] = useState(!!categoriaParam);
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null);
 
   const geo = useGeolocation();
 
@@ -79,6 +79,22 @@ export function TaskerSearch() {
     fetchTaskers();
     return () => controller.abort();
   }, [categoria, estado, ciudad, hasSearched]);
+
+  // Geocode estado/ciudad when changed so the map can re-center
+  useEffect(() => {
+    const query = ciudad ? `${ciudad}, ${estado}, México` : estado ? `${estado}, México` : null;
+    if (!query) { setMapCenter(null); return; }
+    const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
+    fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(query)}&region=mx&key=${key}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.status === 'OK' && data.results[0]) {
+          const { lat, lng } = data.results[0].geometry.location;
+          setMapCenter({ lat, lng });
+        }
+      })
+      .catch(() => {});
+  }, [estado, ciudad]);
 
   const ciudades = estado ? (CIUDADES_POR_ESTADO[estado] || []) : [];
 
@@ -163,8 +179,8 @@ export function TaskerSearch() {
           </div>
         </div>
 
-        {/* Geo + view toggle row */}
-        <div className="mt-3 flex items-center justify-between gap-3">
+        {/* Geo row */}
+        <div className="mt-3">
           <button
             onClick={geo.request}
             disabled={geo.status === 'loading'}
@@ -177,34 +193,6 @@ export function TaskerSearch() {
           >
             📍 {geo.status === 'loading' ? 'Localizando...' : geo.status === 'success' ? 'Ubicación detectada' : 'Usar mi ubicación'}
           </button>
-
-          <div
-            className="flex rounded-xl border border-slate-200 p-0.5"
-            style={{ backgroundColor: '#F9FAFB' }}
-          >
-            <button
-              onClick={() => setViewMode('list')}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
-              style={{
-                backgroundColor: viewMode === 'list' ? '#FFFFFF' : 'transparent',
-                color: viewMode === 'list' ? '#1A1A2E' : '#6B7280',
-                boxShadow: viewMode === 'list' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-              }}
-            >
-              <List className="h-3.5 w-3.5" /> Lista
-            </button>
-            <button
-              onClick={() => setViewMode('map')}
-              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
-              style={{
-                backgroundColor: viewMode === 'map' ? '#FFFFFF' : 'transparent',
-                color: viewMode === 'map' ? '#1A1A2E' : '#6B7280',
-                boxShadow: viewMode === 'map' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-              }}
-            >
-              <Map className="h-3.5 w-3.5" /> Mapa
-            </button>
-          </div>
         </div>
 
         {geo.status === 'error' && (
@@ -212,19 +200,17 @@ export function TaskerSearch() {
         )}
       </div>
 
-      {/* Map view */}
-      {viewMode === 'map' && !loading && !fetchError && (
-        <div className="mb-6">
-          <SearchMap
-            taskers={taskers}
-            onTaskerClick={(id) => {
-              const el = document.getElementById(`tasker-${id}`);
-              if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }}
-            userLocation={geo.status === 'success' ? { lat: geo.lat, lng: geo.lng } : null}
-          />
-        </div>
-      )}
+      {/* Map — always visible */}
+      <div className="mb-6">
+        <SearchMap
+          taskers={taskers}
+          onTaskerClick={(id) => {
+            const el = document.getElementById(`tasker-${id}`);
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }}
+          userLocation={mapCenter ?? (geo.status === 'success' ? { lat: geo.lat, lng: geo.lng } : null)}
+        />
+      </div>
 
       {/* Empty state - no search yet */}
       {!hasSearched ? (

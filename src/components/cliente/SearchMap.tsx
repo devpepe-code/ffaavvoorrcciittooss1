@@ -46,7 +46,7 @@ export function SearchMap({ taskers, onTaskerClick, userLocation: externalUserLo
   const userLocation = externalUserLocation ?? internalUserLocation;
 
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '',
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || '',
   });
 
   useEffect(() => {
@@ -98,14 +98,10 @@ export function SearchMap({ taskers, onTaskerClick, userLocation: externalUserLo
     map.fitBounds(bounds, { top: 50, right: 50, bottom: 50, left: 50 });
   }, [map, taskerMarkers, userLocation]);
 
-  if (loadError || !process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY) {
+  if (loadError) {
     return (
       <div className="flex h-[420px] items-center justify-center rounded-xl border border-slate-200 bg-slate-50">
-        <p className="text-center text-sm" style={{ color: '#6B7280' }}>
-          {!process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-            ? 'Configura NEXT_PUBLIC_GOOGLE_MAPS_API_KEY para ver el mapa'
-            : 'Error al cargar el mapa'}
-        </p>
+        <p className="text-center text-sm" style={{ color: '#6B7280' }}>Error al cargar el mapa</p>
       </div>
     );
   }
